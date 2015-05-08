@@ -41,12 +41,12 @@ define([
     },
     getLatLng: function() {
       console.log('ConditionVM#getLatLng');
-      console.log(GEOC_API_BASE + this.address() + GEOC_POSTFIX);
-      $.getJSON(GEOC_API_BASE + this.address() + GEOC_POSTFIX, $.proxy(this.onGeocodingSuccess, this));
+      var address = encodeURIComponent(this.address());
+      console.log(GEOC_API_BASE + address + GEOC_POSTFIX);
+      $.getJSON(GEOC_API_BASE + address + GEOC_POSTFIX, $.proxy(this.onGeocodingSuccess, this));
     },
-    onGeocodingSuccess: function(data) {
+    onGeocodingSuccess: function(data, status, xhr) {
       console.log('ConditionVM#onGeocodingSuccess');
-      console.log(data.results);
       if (data.status === 'OK') {
         var sgst = [];
         data.results.forEach(function(e) {
