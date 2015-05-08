@@ -1,0 +1,32 @@
+/
+/ Header partial
+/
+
+header#masthead
+  section _bk_data-bind="submit: startSearch"
+    label
+      | lat
+      = slls telephone_field_tag("lat", disabled: true, \
+      :'data-bind' => "value: lat, valueUpdate: 'keyup'")
+    label
+      | lon
+      = slls telephone_field_tag("lon", disabled: true, \
+      :'data-bind' => "value: lon, valueUpdate: 'keyup'")
+    label
+      | address
+      = slls text_field_tag("address", :'data-bind' => "value: address, valueUpdate: 'keyup'")
+    button#start-search type="button"
+      i.fa.fa-search
+    button
+      i.fa.fa-crosshairs
+    label
+      | radius
+      = slls telephone_field_tag("radius", :'data-bind' => "value: radius, valueUpdate: 'keyup'")
+    .sgst-list
+      p
+        | 候補
+      ul data-bind="foreach: suggestion"
+        li data-bind="click: $.proxy($root.selectLocation, $root)"
+          p data-bind="text: address"
+
+= NEWLINE
