@@ -16,10 +16,18 @@ requirejs.config({
 require([
   'knockout',
   'app/condition',
-  'app/poicollection'
+  'app/poicollection',
+  'mod/utils/reducedresize'
 ], function(ko, ConditionVM, POICollectionVM) {
   $(function() {
     //console.log('DOM ready.');
+    if (navigator.userAgent.match(/(iPad|iPod|iPhone);.*CPU.*OS 7_\d/i)) {
+      console.log(navigator.userAgent);
+      $(window).on('reducedResize', function(e) {
+        window.scrollTo(0,1);
+      });
+      window.scrollTo(0,1);
+    }
     var initConditions = {
       lat: 35.658517,
       lon: 139.701334,
@@ -35,8 +43,18 @@ require([
     var collectionVM = new POICollectionVM();
     ko.applyBindings(collectionVM, $('#poi-list').get(0));
 
-    $('#start-search').on('click', function() {
+    $('#param-address-input').on('focus', function(e) {
+      $(this).val('');
+    });
+
+    $('#start-search').on('click', function(e) {
       collectionVM.searchPOI(conditionVM.getAPIParams());
+    });
+
+    $('#toggle-range').on('mouseup', function(e) {
+      e.stopPropagation();
+      e.preventDefault();
+      conditionVM.toggleRange();
     });
 
     collectionVM.searchPOI(conditionVM.getAPIParams());

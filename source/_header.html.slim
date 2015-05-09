@@ -3,30 +3,32 @@
 /
 
 header#masthead
-  section _bk_data-bind="submit: startSearch"
-    label
+  section.params
+    label.param-address
+      button
+        i.fa.fa-crosshairs
+      = slls text_field_tag("address", id: "param-address-input", \
+      :'data-bind' => "value: address, valueUpdate: 'keyup'")
+      .sgst-list
+        ul data-bind="foreach: suggestion"
+          li data-bind="click: $.proxy($root.selectLocation, $root)"
+            p data-bind="text: address"
+    label.param-radius
+      button#toggle-range
+        i.fa.fa-dot-circle-o
+      = slls telephone_field_tag("radius", size: 6, \
+      :'data-bind' => "value: radius, valueUpdate: 'keyup'")
+      span.units
+        | (m)
+    label.param-lat
       | lat
-      = slls telephone_field_tag("lat", disabled: true, \
+      = slls telephone_field_tag("lat", size: 11, disabled: true, \
       :'data-bind' => "value: lat, valueUpdate: 'keyup'")
-    label
+    label.param-lon
       | lon
-      = slls telephone_field_tag("lon", disabled: true, \
+      = slls telephone_field_tag("lon", size: 11, disabled: true, \
       :'data-bind' => "value: lon, valueUpdate: 'keyup'")
-    label
-      | address
-      = slls text_field_tag("address", :'data-bind' => "value: address, valueUpdate: 'keyup'")
     button#start-search type="button"
       i.fa.fa-search
-    button
-      i.fa.fa-crosshairs
-    label
-      | radius
-      = slls telephone_field_tag("radius", :'data-bind' => "value: radius, valueUpdate: 'keyup'")
-    .sgst-list
-      p
-        | 候補
-      ul data-bind="foreach: suggestion"
-        li data-bind="click: $.proxy($root.selectLocation, $root)"
-          p data-bind="text: address"
 
 = NEWLINE

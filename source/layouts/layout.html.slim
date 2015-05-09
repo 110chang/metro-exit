@@ -7,7 +7,7 @@ html lang="ja"
   head
     meta charset="utf-8"
     /meta name="viewport" content="width=1280"
-    meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no"
+    meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui"
     title = current_page.data.title || "mysite"
     meta name="keywords" content="#{get_meta('keywords')}"
     meta name="description" content="#{get_meta('description')}"
@@ -16,6 +16,7 @@ html lang="ja"
     /
     / styles
     /
+    link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" media="screen" rel="stylesheet"
     = NEWLINE
     = slls stylesheet_link_tag("com", type: nil, media: "all")
     = NEWLINE
@@ -33,7 +34,7 @@ html lang="ja"
     - else
       javascript:
         window.__PROXY_URL = 'http://192.168.1.11:8001/proxy.php';
-    script src="http://maps.google.com/maps/api/js?sensor=false&amp;language=ja"
+    script src="http://maps.google.com/maps/api/js?libraries=geometry&amp;sensor=true&amp;language=ja"
     = javascript_include_tag "lib/modernizr", type: nil
     = NEWLINE
     /[if lt IE 9]
