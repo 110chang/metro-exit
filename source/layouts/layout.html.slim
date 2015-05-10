@@ -3,7 +3,7 @@
 /
 
 doctype html
-html lang="ja"
+html.introduction lang="ja"
   head
     meta charset="utf-8"
     /meta name="viewport" content="width=1280"
@@ -44,8 +44,12 @@ html lang="ja"
     = NEWLINE
     = javascript_include_tag "lib/jquery.easing", type: nil
     = NEWLINE
-    = javascript_include_tag "lib/gmap3.min", type: nil
+    = javascript_include_tag "lib/notify", type: nil
     = NEWLINE
+    = javascript_include_tag "lib/notify-bootstrap", type: nil
+    = NEWLINE
+    /= javascript_include_tag "lib/gmap3.min", type: nil
+    /= NEWLINE
     - data_main = get_data_main(current_page.data.id)
     - if build?
       = javascript_include_tag "#{data_main}", type: nil

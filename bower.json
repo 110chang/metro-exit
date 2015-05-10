@@ -14,7 +14,8 @@
     "requirejs": "~2.1.14",
     "almond": "~0.3.0",
     "gmap3": "~6.0.0",
-    "knockout": "~3.3.0"
+    "knockout": "~3.3.0",
+    "notifyjs": "~0.3.2"
   },
   "exportsOverride": {
     "modernizr": {

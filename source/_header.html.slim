@@ -5,30 +5,30 @@
 header#masthead
   section.params
     label.param-address
-      button
-        i.fa.fa-crosshairs
       = slls text_field_tag("address", id: "param-address-input", \
       :'data-bind' => "value: address, valueUpdate: 'keyup'")
-      .sgst-list
+      .sgst-list data-bind="visible: suggestion().length > 0"
         ul data-bind="foreach: suggestion"
           li data-bind="click: $.proxy($root.selectLocation, $root)"
             p data-bind="text: address"
     label.param-radius
-      button#toggle-range
+      button#toggle-range.param-btn type="button" ontouchstart=""
         i.fa.fa-dot-circle-o
-      = slls telephone_field_tag("radius", size: 6, \
+      = slls telephone_field_tag("radius", size: 6, id: "param-radius-input", \
       :'data-bind' => "value: radius, valueUpdate: 'keyup'")
       span.units
         | (m)
     label.param-lat
       | lat
-      = slls telephone_field_tag("lat", size: 11, disabled: true, \
+      = slls telephone_field_tag("lat", size: 10, disabled: true, \
       :'data-bind' => "value: lat, valueUpdate: 'keyup'")
     label.param-lon
       | lon
-      = slls telephone_field_tag("lon", size: 11, disabled: true, \
+      = slls telephone_field_tag("lon", size: 10, disabled: true, \
       :'data-bind' => "value: lon, valueUpdate: 'keyup'")
-    button#start-search type="button"
+    button#start-search type="button" ontouchstart=""
       i.fa.fa-search
+    button#current-location.param-btn type="button"
+      i.fa.fa-crosshairs
 
 = NEWLINE

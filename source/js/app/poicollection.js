@@ -23,6 +23,7 @@ define([
   }
   extend(POICollectionVM.prototype, {
     update: function(data) {
+      console.log('POICollectionVM#update');
       var points = [];
       ko.utils.arrayForEach(data, function(e) {
         var poi = new POIVM(e);
@@ -30,14 +31,27 @@ define([
       }, this);
       this.points(points);
     },
-    searchPOI: function(params) {
-      console.log(PROXY_URL + '?url=' + API_BASE + params);
-      $.getJSON(PROXY_URL + '?url=' + API_BASE + params, $.proxy(this.onAPISuccess, this));
+    search: function(params) {
+      console.log('POICollectionVM#search');
+      //console.log(PROXY_URL + '?url=' + API_BASE + params);
+      var url = PROXY_URL + '?url=' + API_BASE + params;
+      $.getJSON(url, $.proxy(this.onAPISuccess, this)).fail($.proxy(this.onAPIError, this));
     },
     onAPISuccess: function(results) {
-      console.log(results);
+      console.log('POICollectionVM#onAPISuccess');
+      //console.log(results);
       this.update(results);
       this.map.update(this.points());
+
+      if (results.length > 0) {
+        $.notify('出入口情報を取得しました', 'info');
+      } else {
+        $.notify('出入口情報はありません', 'warn');
+      }
+    },
+    onAPIError: function(results) {
+      console.log('POICollectionVM#onAPIError');
+      $.notify('出入口情報を取得できませんでした', 'error');
     }
   });
   

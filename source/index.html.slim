@@ -11,15 +11,21 @@ title: 新規サイト
 
 #gmap
 
-#poi-list
-  ul data-bind="foreach: points"
-    li
-      span data-bind="text: title"
-      | , 
-      span data-bind="text: lat"
-      | , 
-      span data-bind="text: lon"
-      | , 
-      span data-bind="text: floor"
-      | , 
-      span data-bind="text: category"
+#distance data-bind="visible: visibility, style: { left: x() + 'px', top: y() + 'px' }"
+  p.distance data-bind="text: distance"
+  p.duration data-bind="text: '（' + duration() + '）'"
+  /p data-bind="text: x() + ',' + y()"
+
+- if !build?
+  #poi-list
+    ul data-bind="foreach: points"
+      li
+        span data-bind="text: title"
+        | , 
+        span data-bind="text: lat"
+        | , 
+        span data-bind="text: lon"
+        | , 
+        span data-bind="text: floor"
+        | , 
+        span data-bind="text: category"
