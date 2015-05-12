@@ -119,6 +119,7 @@ define([
     },
     update: function(points) {
       console.log('Map#update');
+      this.clearRoute();
       // remove existing markers
       this.markers.forEach(function(marker, i) {
         google.maps.event.clearListeners(marker, 'mouseover');
