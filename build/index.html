@@ -41,6 +41,10 @@
     
     <article id="main">
       <div id="gmap"></div>
+      <div id="distance" data-bind="visible: visibility, style: { left: x() + 'px', top: y() + 'px' }">
+        <p class="distance" data-bind="text: distance"></p>
+        <p class="duration" data-bind="text: '（' + duration() + '）'"></p>
+      </div>
     </article>
     
     <footer id="colophon"></footer>

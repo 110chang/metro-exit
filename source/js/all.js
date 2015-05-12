@@ -818,7 +818,6 @@ define('app/condition',[
     });
     return tmp.join('|');
   }
-  console.log(createComponentStr(componentObj));
 
   function ConditionVM(data) {
     if (_instance !== null) {
@@ -849,16 +848,13 @@ define('app/condition',[
     },
     getLatLng: function() {
       console.log('ConditionVM#getLatLng');
-      this.execGeocoding(GEOC_PREFIX_ADDRESS + encodeURIComponent(this.address()));
-    },
-    execGeocoding: function(params) {
-      console.log('ConditionVM#execGeocoding');
+      var params = GEOC_PREFIX_ADDRESS + encodeURIComponent(this.address());
       $.getJSON(GEOC_API_BASE + params + GEOC_FILTER + GEOC_POSTFIX, $.proxy(this.onGeocodingSuccess, this));
     },
     onGeocodingSuccess: function(data, status, xhr) {
       console.log('ConditionVM#onGeocodingSuccess');
       if (data.status === 'OK') {
-        console.log(data.results);
+        //console.log(data.results);
         var sgst = [];
         data.results.forEach(function(e) {
           sgst.push(new SuggestionVM(e));
@@ -872,17 +868,13 @@ define('app/condition',[
     },
     getAddress: function() {
       console.log('ConditionVM#getAddress');
-      this.execReverseGeocoding(GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon());
-    },
-    execReverseGeocoding: function(params) {
-      console.log('ConditionVM#execGeocoding');
-      console.log(GEOC_API_BASE + params + GEOC_POSTFIX);
+      var params = GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon();
       $.getJSON(GEOC_API_BASE + params + GEOC_POSTFIX, $.proxy(this.onReverseGeocodingSuccess, this));
     },
     onReverseGeocodingSuccess: function(data, status, xhr) {
       console.log('ConditionVM#onReverseGeocodingSuccess');
       if (data.status === 'OK') {
-        console.log(data.results);
+        //console.log(data.results);
         this.selectLocation(new SuggestionVM(data.results[0]));
       } else {
 
@@ -904,7 +896,6 @@ define('app/condition',[
     toggleRange: function() {
       console.log('ConditionVM#toggleRange');
       var tmp = this.radius();
-      console.log(targetRanges.indexOf(tmp));
       var idx = targetRanges.indexOf(tmp);
       if (targetRanges[idx + 1]) {
         tmp = targetRanges[idx + 1];
@@ -961,6 +952,168 @@ define('app/poi',[
 
 /*
 *
+*   DistanceVM
+*
+*   @author Yuji Ito @110chang
+*
+*/
+
+/*
+address_components: Array[3]
+formatted_address: "日本, 仙台駅（宮城）"
+geometry: Object
+  location: Object
+    lat: 38.260297
+    lng: 140.882049
+location_type: "APPROXIMATE"
+viewport: Object
+place_id: "ChIJT7K2iBgoil8Rz4HxlRk2pJs"
+types: Array[3]
+*/
+
+define('app/distance',[
+  'knockout',
+  'mod/extend'
+], function(ko, extend) {
+  var floor = Math.floor;
+
+  function DistanceVM() {
+    this.x = ko.observable(0);
+    this.y = ko.observable(0);
+    this.visibility = ko.observable(false);
+    this.duration = ko.observable('');
+    this.distance = ko.observable('');
+  }
+  extend(DistanceVM.prototype, {
+    show: function() {
+      this.visibility(true);
+    },
+    hide: function() {
+      this.visibility(false);
+    },
+    update: function(x, y, dur, dist) {
+      this.x(floor(x));
+      this.y(floor(y));
+      this.duration(dur);
+      this.distance(dist);
+
+    }
+  });
+  
+  return DistanceVM;
+});
+
+/*
+*
+*   Directions
+*
+*   @author Yuji Ito @110chang
+*
+*/
+
+define('app/directions',[
+  'knockout',
+  'mod/extend',
+  'app/distance'
+], function(ko, extend, DistanceVM) {
+  var renderOpt = {
+    preserveViewport: true,
+    suppressMarkers: true,
+    polylineOptions: {
+      strokeColor: '#005BB7',
+      strokeOpacity: 0.8,
+      strokeWeight: 4
+    }
+  };
+
+  function Directions(map) {
+    this.map = map;
+    this.service = new google.maps.DirectionsService();
+    //this.display = new google.maps.DirectionsRenderer(renderOpt);
+    //this.display.setMap(map);
+
+    // distance circle
+    this.distCircle = new google.maps.Circle({
+      fillColor: "#005BB7",
+      strokeOpacity: 0,
+      strokeWeight: 0,
+      fillOpacity: 1,
+      map: map,
+      radius: 10
+    });
+
+    var distanceVM = this.distanceVM = new DistanceVM();
+    ko.applyBindings(distanceVM, $('#distance').get(0));
+
+    this.from = null;
+    this.to = null;
+  }
+  extend(Directions.prototype, {
+    update: function(from, to) {
+      console.log('Directions#update');
+      this.from = from;
+      this.to = to;
+      var opt = {
+        origin: from,
+        destination: to,
+        travelMode: google.maps.TravelMode.WALKING
+      };
+      this.clear();
+
+      // create route renderer
+      this.display = new google.maps.DirectionsRenderer(renderOpt);
+      this.display.setMap(this.map);
+
+      this.service.route(opt, $.proxy(this.onRouteSuccess, this));
+    },
+    onRouteSuccess: function(result, status) {
+      console.log('Directions#success');
+      if (status == google.maps.DirectionsStatus.OK) {
+        this.display.setDirections(result);
+        //console.log(result.routes[0].legs[0].duration);
+        //console.log(result.routes[0].legs[0].distance);
+        var pos = this.fromLatLngToPixel(this.to);
+        var dur = result.routes[0].legs[0].duration.text;
+        var dist = result.routes[0].legs[0].distance.text;
+        this.distanceVM.show();
+        this.distanceVM.update(pos.x, pos.y, dur, dist);
+        //$.notify('経路を取得しました', 'info');
+      } else {
+        $.notify('経路を取得できませんでした', 'error');
+      }
+    },
+    clear: function() {
+      console.log('Directions#clear');
+      if (this.display != null) {
+        this.display.setMap(null);
+        this.display = null;
+      }
+      this.distanceVM.hide();
+    },
+    fromLatLngToPixel: function (position) {
+      // via http://stackoverflow.com/questions/1538681/how-to-call-fromlatlngtodivpixel-in-google-maps-api-v3
+      var scale = Math.pow(2, this.map.getZoom());
+      var proj = this.map.getProjection();
+      var bounds = this.map.getBounds();
+
+      var nw = proj.fromLatLngToPoint(
+        new google.maps.LatLng(
+          bounds.getNorthEast().lat(),
+          bounds.getSouthWest().lng()
+        ));
+      var point = proj.fromLatLngToPoint(position);
+
+      return new google.maps.Point(
+        Math.floor((point.x - nw.x) * scale),
+        Math.floor((point.y - nw.y) * scale));
+    }
+  });
+  
+  return Directions;
+});
+
+/*
+*
 *   Map
 *
 *   @author Yuji Ito @110chang
@@ -971,8 +1124,9 @@ define('app/map',[
   'knockout',
   'mod/extend',
   'app/condition',
-  'app/poi'
-], function(ko, extend, ConditionVM, POIVM) {
+  'app/poi',
+  'app/directions'
+], function(ko, extend, ConditionVM, POIVM, Directions) {
 
   function Map(qID) {
     this.$el = $(qID);
@@ -1016,12 +1170,23 @@ define('app/map',[
       center: this.center,
       radius: ConditionVM().radius() * 1
     });
+
+    // initialize direction service
+    this.directions = new Directions(this.map);
+
+    google.maps.event.addListener(this.map, "center_changed", $.proxy(this.onCenterChanged, this));
   }
   extend(Map.prototype, {
+    onCenterChanged: function() {
+      console.log('map dragged');
+      this.directions.clear();
+    },
     latLng: function(lat, lng) {
+      //console.log('Map#latLng');
       return new google.maps.LatLng(lat, lng);
     },
     createMarker: function(latLng, title, content, icon) {
+      //console.log('Map#createMarker');
       // create marker option
       var opt = {
         position: latLng,
@@ -1034,6 +1199,7 @@ define('app/map',[
 
       // create marker
       var marker = new google.maps.Marker(opt);
+      var _self = this;
 
       // create infowindow if specified content
       if (content) {
@@ -1046,10 +1212,24 @@ define('app/map',[
         google.maps.event.addListener(marker, 'mouseout', function() {
           infoWindow.close(this.map, marker);
         });
+        google.maps.event.addListener(marker, 'click', function() {
+          _self.findRoute(this.getPosition());
+        });
       }
       return marker;
     },
+    createInfoContent: function(lat, lng, title) {
+      //console.log('Map#createInfoContent');
+      var content = '';
+      content += title;
+      return content;
+    },
+    findRoute: function(to) {
+      console.log('Map#findRoute');
+      this.directions.update(this.center, to);
+    },
     update: function(points) {
+      console.log('Map#update');
       // remove existing markers
       this.markers.forEach(function(marker, i) {
         google.maps.event.clearListeners(marker, 'mouseover');
@@ -1072,14 +1252,17 @@ define('app/map',[
         var latLng = this.latLng(p.lat(), p.lon());
         var title = p.title();
         var icon = this.exitIcon;
+        var content = this.createInfoContent(p.lat(), p.lon(), title);
+
+        // エレベーター判定
         if (/エレベーター?/.test(title)) {
-          console.log(title);
           icon = this.elevIcon;
         }
-        this.markers.push(this.createMarker(latLng, title, title, icon));
+        this.markers.push(this.createMarker(latLng, title, content, icon));
         bounds.extend(latLng);
       }, this);
 
+      // update range circle
       this.rangeCircle.setCenter(this.center);
       this.rangeCircle.setRadius(ConditionVM().radius() * 1);
 
@@ -1116,6 +1299,7 @@ define('app/poicollection',[
   }
   extend(POICollectionVM.prototype, {
     update: function(data) {
+      console.log('POICollectionVM#update');
       var points = [];
       ko.utils.arrayForEach(data, function(e) {
         var poi = new POIVM(e);
@@ -1123,21 +1307,27 @@ define('app/poicollection',[
       }, this);
       this.points(points);
     },
-    searchPOI: function(params) {
-      console.log(PROXY_URL + '?url=' + API_BASE + params);
-      $.getJSON(PROXY_URL + '?url=' + API_BASE + params, $.proxy(this.onAPISuccess, this)).fail(function() {
-        console.log( "error" );
-      });
+    search: function(params) {
+      console.log('POICollectionVM#search');
+      //console.log(PROXY_URL + '?url=' + API_BASE + params);
+      var url = PROXY_URL + '?url=' + API_BASE + params;
+      $.getJSON(url, $.proxy(this.onAPISuccess, this)).fail($.proxy(this.onAPIError, this));
     },
     onAPISuccess: function(results) {
-      console.log(results);
+      console.log('POICollectionVM#onAPISuccess');
+      //console.log(results);
       this.update(results);
       this.map.update(this.points());
+
       if (results.length > 0) {
         $.notify('出入口情報を取得しました', 'info');
       } else {
         $.notify('出入口情報はありません', 'warn');
       }
+    },
+    onAPIError: function(results) {
+      console.log('POICollectionVM#onAPIError');
+      $.notify('出入口情報を取得できませんでした', 'error');
     }
   });
   
@@ -1163,9 +1353,8 @@ longitude: 139.6259765
 speed: null
 */
 define('app/geolocation',[
-  'knockout',
   'mod/extend'
-], function(ko, extend) {
+], function(extend) {
   var _instance = null;
 
   function Geolocation() {
@@ -1179,6 +1368,7 @@ define('app/geolocation',[
   }
   extend(Geolocation.prototype, {
     getCurrent: function() {
+      console.log('Geolocation#getCurrent');
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition($.proxy(this.success, this), $.proxy(this.error, this));
       } else {
@@ -1187,7 +1377,6 @@ define('app/geolocation',[
     },
     success: function(pos) {
       console.log('Geolocation#success');
-      console.log(pos.coords);
       //this.lat = pos.coords.latitude;
       //this.lon = pos.coords.longitude;
       this.lat = 35.684378;//test code
@@ -1198,7 +1387,6 @@ define('app/geolocation',[
       console.log('Geolocation#error');
       console.log(error.code);
       $(window).trigger('onGeolocationFail');
-
     }
   });
   
@@ -1418,7 +1606,7 @@ require([
     });
 
     $('#start-search').on('click', function(e) {
-      collectionVM.searchPOI(conditionVM.getAPIParams());
+      collectionVM.search(conditionVM.getAPIParams());
     });
 
     $('#toggle-range').on('mouseup', function(e) {
@@ -1426,23 +1614,23 @@ require([
     });
 
     $('#current-location').on('mouseup', function(e) {
-      $.notify('現在地を確認中しています', 'info');
+      $.notify('現在地を確認しています', 'info');
       geolocation.getCurrent();
     });
 
     $(window).on('onGeolocationSuccess', function(e) {
       conditionVM.setLatLng(geolocation.lat, geolocation.lon);
-      collectionVM.searchPOI(conditionVM.getAPIParams());
+      collectionVM.search(conditionVM.getAPIParams());
       $.notify('現在地を取得しました', 'info');
     });
 
     $(window).on('onGeolocationFail', function(e) {
       conditionVM.setLatLng(geolocation.lat, geolocation.lon);
-      collectionVM.searchPOI(conditionVM.getAPIParams());
-      $.notify('現在地を取得できませんでした', 'warn');
+      collectionVM.search(conditionVM.getAPIParams());
+      $.notify('現在地を取得できませんでした', 'error');
     });
 
-    collectionVM.searchPOI(conditionVM.getAPIParams());
+    collectionVM.search(conditionVM.getAPIParams());
   });
 });
 
