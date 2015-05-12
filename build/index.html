@@ -45,13 +45,7 @@
         <p class="distance" data-bind="text: distance"></p>
         <p class="duration" data-bind="text: '（' + duration() + '）'"></p>
       </div>
-      <div id="poi-list">
-        <ul data-bind="foreach: points">
-          <li>
-            <span data-bind="text: title"></span>, <span data-bind="text: lat"></span>, <span data-bind="text: lon"></span>, <span data-bind="text: floor"></span>, <span data-bind="text: category"></span>
-          </li>
-        </ul>
-      </div>
+      <div id="poi-list"></div>
     </article>
     
     <footer id="colophon"></footer>
