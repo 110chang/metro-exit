@@ -18,7 +18,7 @@ html.introduction lang="ja"
     /
     link href="http://fonts.googleapis.com/css?family=Montserrat:400,700" media="screen" rel="stylesheet"
     = NEWLINE
-    = slls stylesheet_link_tag("com", type: nil, media: "all")
+    = slls stylesheet_link_tag("com", type: nil, media: "all") 
     = NEWLINE
     - page_styles = get_page_styles(current_page.data.id)
     - page_styles.each do |v|
@@ -59,8 +59,9 @@ html.introduction lang="ja"
     /
     / others
     /
-    = slls_favicon_tag '/img/favicon.ico', :rel => "shortcut icon", type: nil
-    link rel="apple-touch-icon" href="apple-touch-icon.png"
+    = slls_favicon_tag "/img/favicon.ico", rel: "shortcut icon", type: nil
+    = NEWLINE
+    = slls_favicon_tag "/img/apple-touch-icon.png", rel: "apple-touch-icon", type: nil
   = NEWLINE
   body id="#{current_page.data.id}" class="cat-#{current_page.data.category}"
     /- if build? 
