@@ -82,6 +82,7 @@ require([
     stashInputValue($('#param-radius-input'));
 
     $('#start-search').on('click', function(e) {
+      $.notify('出入口情報を取得しています', 'info');
       collectionVM.search(conditionVM.getAPIParams());
     });
 
@@ -89,7 +90,7 @@ require([
       conditionVM.toggleRange();
     });
 
-    $('#current-location').on('mouseup', function(e) {
+    $('#current-location').on('click', function(e) {
       $.notify('現在地を確認しています', 'info');
       geolocation.getCurrent();
     });
