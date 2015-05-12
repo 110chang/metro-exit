@@ -23,14 +23,23 @@ define([
   'knockout',
   'mod/extend'
 ], function(ko, extend) {
+  var _instance = null;
   var floor = Math.floor;
 
   function DistanceVM() {
+    if (_instance !== null) {
+      return _instance;
+    }
+    if (!(this instanceof DistanceVM)) {
+      return new DistanceVM();
+    }
     this.x = ko.observable(0);
     this.y = ko.observable(0);
     this.visibility = ko.observable(false);
     this.duration = ko.observable('');
     this.distance = ko.observable('');
+
+    _instance = this;
   }
   extend(DistanceVM.prototype, {
     show: function() {
@@ -44,7 +53,6 @@ define([
       this.y(floor(y));
       this.duration(dur);
       this.distance(dist);
-
     }
   });
   

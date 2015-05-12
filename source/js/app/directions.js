@@ -37,8 +37,8 @@ define([
       radius: 10
     });
 
-    var distanceVM = this.distanceVM = new DistanceVM();
-    ko.applyBindings(distanceVM, $('#distance').get(0));
+    // distance VM
+    this.distanceVM = DistanceVM();
 
     this.from = null;
     this.to = null;
@@ -65,16 +65,15 @@ define([
       console.log('Directions#success');
       if (status == google.maps.DirectionsStatus.OK) {
         this.display.setDirections(result);
-        //console.log(result.routes[0].legs[0].duration);
-        //console.log(result.routes[0].legs[0].distance);
         var pos = this.fromLatLngToPixel(this.to);
-        var dur = result.routes[0].legs[0].duration.text;
-        var dist = result.routes[0].legs[0].distance.text;
+        var leg = result.routes[0].legs[0];
+        var dur = leg.duration.text;
+        var dist = leg.distance.value > 999 ? leg.distance.text : leg.distance.value + ' m';
         this.distanceVM.show();
         this.distanceVM.update(pos.x, pos.y, dur, dist);
-        //$.notify('経路を取得しました', 'info');
+        $(window).trigger('onDirectionsFind');
       } else {
-        $.notify('経路を取得できませんでした', 'error');
+        $(window).trigger('onNoDirectionsFind');
       }
     },
     clear: function() {
@@ -95,12 +94,14 @@ define([
         new google.maps.LatLng(
           bounds.getNorthEast().lat(),
           bounds.getSouthWest().lng()
-        ));
+        )
+      );
       var point = proj.fromLatLngToPoint(position);
 
       return new google.maps.Point(
         Math.floor((point.x - nw.x) * scale),
-        Math.floor((point.y - nw.y) * scale));
+        Math.floor((point.y - nw.y) * scale)
+      );
     }
   });
   

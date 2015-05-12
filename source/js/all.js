@@ -866,8 +866,10 @@ define('app/condition',[
 
       }
     },
-    getAddress: function() {
+    getAddress: function(lat, lon) {
       console.log('ConditionVM#getAddress');
+      this.lat(lat);
+      this.lon(lon);
       var params = GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon();
       $.getJSON(GEOC_API_BASE + params + GEOC_POSTFIX, $.proxy(this.onReverseGeocodingSuccess, this));
     },
@@ -975,14 +977,23 @@ define('app/distance',[
   'knockout',
   'mod/extend'
 ], function(ko, extend) {
+  var _instance = null;
   var floor = Math.floor;
 
   function DistanceVM() {
+    if (_instance !== null) {
+      return _instance;
+    }
+    if (!(this instanceof DistanceVM)) {
+      return new DistanceVM();
+    }
     this.x = ko.observable(0);
     this.y = ko.observable(0);
     this.visibility = ko.observable(false);
     this.duration = ko.observable('');
     this.distance = ko.observable('');
+
+    _instance = this;
   }
   extend(DistanceVM.prototype, {
     show: function() {
@@ -996,7 +1007,6 @@ define('app/distance',[
       this.y(floor(y));
       this.duration(dur);
       this.distance(dist);
-
     }
   });
   
@@ -1042,8 +1052,8 @@ define('app/directions',[
       radius: 10
     });
 
-    var distanceVM = this.distanceVM = new DistanceVM();
-    ko.applyBindings(distanceVM, $('#distance').get(0));
+    // distance VM
+    this.distanceVM = DistanceVM();
 
     this.from = null;
     this.to = null;
@@ -1070,16 +1080,15 @@ define('app/directions',[
       console.log('Directions#success');
       if (status == google.maps.DirectionsStatus.OK) {
         this.display.setDirections(result);
-        //console.log(result.routes[0].legs[0].duration);
-        //console.log(result.routes[0].legs[0].distance);
         var pos = this.fromLatLngToPixel(this.to);
-        var dur = result.routes[0].legs[0].duration.text;
-        var dist = result.routes[0].legs[0].distance.text;
+        var leg = result.routes[0].legs[0];
+        var dur = leg.duration.text;
+        var dist = leg.distance.value > 999 ? leg.distance.text : leg.distance.value + ' m';
         this.distanceVM.show();
         this.distanceVM.update(pos.x, pos.y, dur, dist);
-        //$.notify('経路を取得しました', 'info');
+        $(window).trigger('onDirectionsFind');
       } else {
-        $.notify('経路を取得できませんでした', 'error');
+        $(window).trigger('onNoDirectionsFind');
       }
     },
     clear: function() {
@@ -1100,12 +1109,14 @@ define('app/directions',[
         new google.maps.LatLng(
           bounds.getNorthEast().lat(),
           bounds.getSouthWest().lng()
-        ));
+        )
+      );
       var point = proj.fromLatLngToPoint(position);
 
       return new google.maps.Point(
         Math.floor((point.x - nw.x) * scale),
-        Math.floor((point.y - nw.y) * scale));
+        Math.floor((point.y - nw.y) * scale)
+      );
     }
   });
   
@@ -1124,32 +1135,33 @@ define('app/map',[
   'knockout',
   'mod/extend',
   'app/condition',
-  'app/poi',
   'app/directions'
-], function(ko, extend, ConditionVM, POIVM, Directions) {
+], function(ko, extend, ConditionVM, Directions) {
+  var exitIcon = {
+    url: '../img/ico_exit.png',
+    scaledSize : new google.maps.Size(22, 40),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(11, 40)
+  };
+  var elevIcon = {
+    url: '../img/ico_elev.png',
+    scaledSize : new google.maps.Size(22, 40),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(11, 40)
+  };
+
+  function latLng(lat, lng) {
+    return new google.maps.LatLng(lat, lng);
+  }
 
   function Map(qID) {
     this.$el = $(qID);
 
     // set center;
-    this.center = this.latLng(ConditionVM().lat(), ConditionVM().lon());
+    this.center = latLng(ConditionVM().lat(), ConditionVM().lon());
 
     // merker array
     this.markers = new google.maps.MVCArray();
-
-    // custom icons
-    this.exitIcon = {
-      url: '../img/ico_exit.png',
-      scaledSize : new google.maps.Size(22, 40),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(11, 40)
-    };
-    this.elevIcon = {
-      url: '../img/ico_elev.png',
-      scaledSize : new google.maps.Size(22, 40),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(11, 40)
-    };
 
     // initialize map
     this.map = new google.maps.Map(this.$el.get(0), {
@@ -1174,16 +1186,17 @@ define('app/map',[
     // initialize direction service
     this.directions = new Directions(this.map);
 
-    google.maps.event.addListener(this.map, "center_changed", $.proxy(this.onCenterChanged, this));
+    google.maps.event.addListener(this.map, 'center_changed', $.proxy(this.onCenterChanged, this));
   }
   extend(Map.prototype, {
     onCenterChanged: function() {
-      console.log('map dragged');
-      this.directions.clear();
+      console.log('Map#onCenterChanged');
+      console.log('center changed');
+      //this.clearRoute();
     },
-    latLng: function(lat, lng) {
-      //console.log('Map#latLng');
-      return new google.maps.LatLng(lat, lng);
+    clearRoute: function() {
+      console.log('Map#clearRoute');
+      this.directions.clear();
     },
     createMarker: function(latLng, title, content, icon) {
       //console.log('Map#createMarker');
@@ -1213,12 +1226,13 @@ define('app/map',[
           infoWindow.close(this.map, marker);
         });
         google.maps.event.addListener(marker, 'click', function() {
+          infoWindow.open(this.map, marker);
           _self.findRoute(this.getPosition());
         });
       }
       return marker;
     },
-    createInfoContent: function(lat, lng, title) {
+    createInfoContent: function(latLng, title) {
       //console.log('Map#createInfoContent');
       var content = '';
       content += title;
@@ -1237,7 +1251,7 @@ define('app/map',[
         marker.setMap(null);
       });
       // set center
-      this.center = this.latLng(ConditionVM().lat(), ConditionVM().lon());
+      this.center = latLng(ConditionVM().lat(), ConditionVM().lon());
       this.map.panTo(this.center);
       
       // create center marker
@@ -1249,17 +1263,13 @@ define('app/map',[
 
       // operation each POI
       points.forEach(function(p) {
-        var latLng = this.latLng(p.lat(), p.lon());
         var title = p.title();
-        var icon = this.exitIcon;
-        var content = this.createInfoContent(p.lat(), p.lon(), title);
+        var coords = latLng(p.lat(), p.lon());
+        var icon = /エレベーター?/.test(title) ? elevIcon : exitIcon;// エレベーター判定
+        var content = this.createInfoContent(coords, title);
 
-        // エレベーター判定
-        if (/エレベーター?/.test(title)) {
-          icon = this.elevIcon;
-        }
-        this.markers.push(this.createMarker(latLng, title, content, icon));
-        bounds.extend(latLng);
+        this.markers.push(this.createMarker(coords, title, content, icon));
+        bounds.extend(coords);
       }, this);
 
       // update range circle
@@ -1285,17 +1295,15 @@ define('app/map',[
 define('app/poicollection',[
   'knockout',
   'mod/extend',
-  'app/condition',
   'app/poi',
   'app/map'
-], function(ko, extend, ConditionVM, POIVM, Map) {
+], function(ko, extend, POIVM) {
   // Tokyo Metro API and my proxy settings
   var PROXY_URL = window.__PROXY_URL;
   var API_BASE = 'https://api.tokyometroapp.jp/api/v2/places&rdf:type=ug:Poi&';
 
   function POICollectionVM() {
     this.points = ko.observableArray([]);
-    this.map = new Map('#gmap');
   }
   extend(POICollectionVM.prototype, {
     update: function(data) {
@@ -1315,19 +1323,12 @@ define('app/poicollection',[
     },
     onAPISuccess: function(results) {
       console.log('POICollectionVM#onAPISuccess');
-      //console.log(results);
       this.update(results);
-      this.map.update(this.points());
-
-      if (results.length > 0) {
-        $.notify('出入口情報を取得しました', 'info');
-      } else {
-        $.notify('出入口情報はありません', 'warn');
-      }
+      $(window).trigger('onMetroAPISuccess', { results: results });
     },
     onAPIError: function(results) {
       console.log('POICollectionVM#onAPIError');
-      $.notify('出入口情報を取得できませんでした', 'error');
+      $(window).trigger('onMetroAPIFail');
     }
   });
   
@@ -1547,32 +1548,45 @@ require([
   'knockout',
   'app/condition',
   'app/poicollection',
+  'app/distance',
+  'app/map',
   'app/geolocation',
   'mod/utils/reducedresize'
-], function(ko, ConditionVM, POICollectionVM, Geolocation) {
+], function(ko, ConditionVM, POICollectionVM, DistanceVM, Map, Geolocation) {
+
+  var initConditions = {
+    lat: 35.658517,
+    lon: 139.701334,
+    address: '日本, 渋谷駅（東京）',
+    radius: 500
+  };
+
   function initializeNotifyPos() {
     $.notify.defaults({
       globalPosition: 'top left',
       elementPosition: 'top left'
     });
   }
+  function stashInputValue($el) {
+    if ($el.size() > 0) {
+      $el.on('focus.stash', function(e) {
+        $el.data('stash', $el.val());
+        $el.val('');
+      }).on('blur.stash', function(e) {
+        if ($el.val() === '') {
+          $el.val($el.data('stash'));
+        }
+      });
+    }
+  }
+
   $(function() {
     //console.log('DOM ready.');
-    if (navigator.userAgent.match(/(iPad|iPod|iPhone);.*CPU.*OS 7_\d/i)) {
-      console.log(navigator.userAgent);
-      $(window).on('reducedResize', function(e) {
-        window.scrollTo(0,1);
-      });
-      window.scrollTo(0,1);
-    }
     initializeNotifyPos();
 
-    var initConditions = {
-      lat: 35.658517,
-      lon: 139.701334,
-      address: '日本, 渋谷駅（東京）',
-      radius: 500
-    };
+    //
+    // initialize ViewModels and Objects
+    //
 
     // manage search condition
     var conditionVM = new ConditionVM(initConditions);
@@ -1582,38 +1596,27 @@ require([
     var collectionVM = new POICollectionVM();
     ko.applyBindings(collectionVM, $('#poi-list').get(0));
 
+    var map = new Map('#gmap');
+
+    var distanceVM = new DistanceVM();
+    ko.applyBindings(distanceVM, $('#distance').get(0));
+
     // geolocation
     var geolocation = new Geolocation();
 
-    var savedAddress = '';
-    $('#param-address-input').on('focus', function(e) {
-      savedAddress = $(this).val();
-      $(this).val('');
-    }).on('blur', function(e) {
-      if ($(this).val() === '') {
-        $(this).val(savedAddress);
-      }
-    });
+    //
+    // add DOM events
+    //
 
-    var savedRange = '';
-    $('#param-radius-input').on('focus', function(e) {
-      savedRange = $(this).val();
-      $(this).val('');
-    }).on('blur', function(e) {
-      if ($(this).val() === '') {
-        $(this).val(savedRange);
-      }
-    });
-    $('#param-radius-input').parent('label').on('click', function(e) {
-      e.stopPropagation();
-    });
+    // stash values when focus input element
+    stashInputValue($('#param-address-input'));
+    stashInputValue($('#param-radius-input'));
 
     $('#start-search').on('click', function(e) {
       collectionVM.search(conditionVM.getAPIParams());
     });
 
     $('#toggle-range').on('click', function(e) {
-
       conditionVM.toggleRange();
     });
 
@@ -1622,18 +1625,57 @@ require([
       geolocation.getCurrent();
     });
 
+    $('#distance').on('click', function(e) {
+      distanceVM.hide();
+      map.clearRoute();
+    });
+
+    // Gray area visible using iOS 7.1 minimal-ui
+    // via http://stackoverflow.com/questions/22391157/gray-area-visible-when-switching-from-portrait-to-landscape-using-ios-7-1-minima
+    if (navigator.userAgent.match(/(iPad|iPod|iPhone);.*CPU.*OS 7_\d/i)) {
+      console.log(navigator.userAgent);
+      $(window).on('reducedResize', function(e) {
+        window.scrollTo(0,1);
+      });
+      window.scrollTo(0,1);
+    }
+
+    //
+    // callback list
+    //
+
+    // Tokyo Metro API
+    $(window).on('onMetroAPISuccess', function(e, data) {
+      if (data.results.length > 0) {
+        map.update(collectionVM.points());
+        $.notify('出入口情報を取得しました', 'info');
+      } else {
+        $.notify('出入口情報はありません', 'warn');
+      }
+    });
+    $(window).on('onMetroAPIFail', function(e) {
+      $.notify('出入口情報を取得できませんでした', 'error');
+    });
+
+    // Googlemap Directions API
+    $(window).on('onDirectionsFind', function(e) {
+      //$.notify('経路を取得しました', 'info');
+    });
+    $(window).on('onNoDirectionsFind', function(e) {
+      $.notify('経路を取得できませんでした', 'error');
+    });
+
+    // HTML5 Geolocation API
     $(window).on('onGeolocationSuccess', function(e) {
-      conditionVM.setLatLng(geolocation.lat, geolocation.lon);
+      conditionVM.getAddress(geolocation.lat, geolocation.lon);
       collectionVM.search(conditionVM.getAPIParams());
       $.notify('現在地を取得しました', 'info');
     });
-
     $(window).on('onGeolocationFail', function(e) {
-      conditionVM.setLatLng(geolocation.lat, geolocation.lon);
-      collectionVM.search(conditionVM.getAPIParams());
       $.notify('現在地を取得できませんでした', 'error');
     });
 
+    // initialize POI
     collectionVM.search(conditionVM.getAPIParams());
   });
 });

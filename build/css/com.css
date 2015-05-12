@@ -289,14 +289,16 @@ button::-moz-focus-inner {
 }
 
 #distance {
-  position: absolute;
+  position: fixed;
   left: 0;
-  top: 0;
-  padding: 1em;
-  background: #0085C0;
-  border-radius: 50%;
+  bottom: 50px;
+  width: 100%;
+  margin-bottom: -4em;
+  padding: 0.75em 0;
+  background: rgba(0, 133, 192, 0.9);
   color: #FFF;
   text-align: center;
+  transition: margin-bottom 0.25s cubic-bezier(1, 0, 0, 1);
 }
 #distance .distance {
   font-family: "Montserrat", sans-serif;
@@ -304,6 +306,19 @@ button::-moz-focus-inner {
 #distance .duration {
   font-size: 0.75rem;
   line-height: 140%;
+}
+#distance .close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  width: 50px;
+  height: 50px;
+  font-size: 1.25rem;
+  line-height: 2.1em;
+}
+
+#distance.show {
+  margin-bottom: 0;
 }
 
 #poi-list {
@@ -375,5 +390,9 @@ button::-moz-focus-inner {
 
   #main {
     padding-bottom: 80px;
+  }
+
+  #distance {
+    bottom: 80px;
   }
 }

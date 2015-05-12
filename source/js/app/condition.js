@@ -84,8 +84,10 @@ define([
 
       }
     },
-    getAddress: function() {
+    getAddress: function(lat, lon) {
       console.log('ConditionVM#getAddress');
+      this.lat(lat);
+      this.lon(lon);
       var params = GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon();
       $.getJSON(GEOC_API_BASE + params + GEOC_POSTFIX, $.proxy(this.onReverseGeocodingSuccess, this));
     },

@@ -11,9 +11,11 @@ title: Dokokara | どこから（東京メトロの駅に）入るのが近い�
 
 #gmap
 
-#distance data-bind="visible: visibility, style: { left: x() + 'px', top: y() + 'px' }"
-  p.distance data-bind="text: distance"
-  p.duration data-bind="text: '（' + duration() + '）'"
+#distance data-bind="css: { show: visibility }"
+  span.distance data-bind="text: distance"
+  span.duration data-bind="text: '（' + duration() + '）'"
+  span.close
+    i.fa.fa-times
   /p data-bind="text: x() + ',' + y()"
 
 #poi-list

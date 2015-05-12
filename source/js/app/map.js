@@ -10,32 +10,33 @@ define([
   'knockout',
   'mod/extend',
   'app/condition',
-  'app/poi',
   'app/directions'
-], function(ko, extend, ConditionVM, POIVM, Directions) {
+], function(ko, extend, ConditionVM, Directions) {
+  var exitIcon = {
+    url: '../img/ico_exit.png',
+    scaledSize : new google.maps.Size(22, 40),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(11, 40)
+  };
+  var elevIcon = {
+    url: '../img/ico_elev.png',
+    scaledSize : new google.maps.Size(22, 40),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(11, 40)
+  };
+
+  function latLng(lat, lng) {
+    return new google.maps.LatLng(lat, lng);
+  }
 
   function Map(qID) {
     this.$el = $(qID);
 
     // set center;
-    this.center = this.latLng(ConditionVM().lat(), ConditionVM().lon());
+    this.center = latLng(ConditionVM().lat(), ConditionVM().lon());
 
     // merker array
     this.markers = new google.maps.MVCArray();
-
-    // custom icons
-    this.exitIcon = {
-      url: '../img/ico_exit.png',
-      scaledSize : new google.maps.Size(22, 40),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(11, 40)
-    };
-    this.elevIcon = {
-      url: '../img/ico_elev.png',
-      scaledSize : new google.maps.Size(22, 40),
-      origin: new google.maps.Point(0, 0),
-      anchor: new google.maps.Point(11, 40)
-    };
 
     // initialize map
     this.map = new google.maps.Map(this.$el.get(0), {
@@ -60,16 +61,17 @@ define([
     // initialize direction service
     this.directions = new Directions(this.map);
 
-    google.maps.event.addListener(this.map, "center_changed", $.proxy(this.onCenterChanged, this));
+    google.maps.event.addListener(this.map, 'center_changed', $.proxy(this.onCenterChanged, this));
   }
   extend(Map.prototype, {
     onCenterChanged: function() {
-      console.log('map dragged');
-      this.directions.clear();
+      console.log('Map#onCenterChanged');
+      console.log('center changed');
+      //this.clearRoute();
     },
-    latLng: function(lat, lng) {
-      //console.log('Map#latLng');
-      return new google.maps.LatLng(lat, lng);
+    clearRoute: function() {
+      console.log('Map#clearRoute');
+      this.directions.clear();
     },
     createMarker: function(latLng, title, content, icon) {
       //console.log('Map#createMarker');
@@ -99,12 +101,13 @@ define([
           infoWindow.close(this.map, marker);
         });
         google.maps.event.addListener(marker, 'click', function() {
+          infoWindow.open(this.map, marker);
           _self.findRoute(this.getPosition());
         });
       }
       return marker;
     },
-    createInfoContent: function(lat, lng, title) {
+    createInfoContent: function(latLng, title) {
       //console.log('Map#createInfoContent');
       var content = '';
       content += title;
@@ -123,7 +126,7 @@ define([
         marker.setMap(null);
       });
       // set center
-      this.center = this.latLng(ConditionVM().lat(), ConditionVM().lon());
+      this.center = latLng(ConditionVM().lat(), ConditionVM().lon());
       this.map.panTo(this.center);
       
       // create center marker
@@ -135,17 +138,13 @@ define([
 
       // operation each POI
       points.forEach(function(p) {
-        var latLng = this.latLng(p.lat(), p.lon());
         var title = p.title();
-        var icon = this.exitIcon;
-        var content = this.createInfoContent(p.lat(), p.lon(), title);
+        var coords = latLng(p.lat(), p.lon());
+        var icon = /エレベーター?/.test(title) ? elevIcon : exitIcon;// エレベーター判定
+        var content = this.createInfoContent(coords, title);
 
-        // エレベーター判定
-        if (/エレベーター?/.test(title)) {
-          icon = this.elevIcon;
-        }
-        this.markers.push(this.createMarker(latLng, title, content, icon));
-        bounds.extend(latLng);
+        this.markers.push(this.createMarker(coords, title, content, icon));
+        bounds.extend(coords);
       }, this);
 
       // update range circle
