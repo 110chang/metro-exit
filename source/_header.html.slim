@@ -4,14 +4,14 @@
 
 header#masthead
   section.params
-    label.param-address
+    span.param-address
       = slls text_field_tag("address", id: "param-address-input", \
       :'data-bind' => "value: address, valueUpdate: 'keyup'")
       .sgst-list data-bind="visible: suggestion().length > 0"
         ul data-bind="foreach: suggestion"
           li data-bind="click: $.proxy($root.selectLocation, $root)"
             p data-bind="text: address"
-    label.param-radius
+    span.param-radius
       button#toggle-range.param-btn type="button" ontouchstart=""
         i.fa.fa-dot-circle-o
       = slls telephone_field_tag("radius", size: 6, id: "param-radius-input", \

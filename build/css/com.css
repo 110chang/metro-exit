@@ -185,13 +185,13 @@ button::-moz-focus-inner {
   padding: 7px;
   padding-left: 57px;
 }
-.params label, .params button {
+.params label, .params button, .params span {
   position: relative;
   display: inline-block;
   vertical-align: middle;
   font-family: "Montserrat", sans-serif;
 }
-.params label {
+.params label, .params span {
   margin-right: 15px;
 }
 .params label > input {

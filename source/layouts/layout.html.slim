@@ -55,10 +55,12 @@ html.introduction lang="ja"
       = javascript_include_tag "#{data_main}", type: nil
     - else
       = javascript_include_tag "lib/require", type: nil, :'data-main' => data_main
+    = NEWLINE
     /
     / others
     /
-    /= slls_favicon_tag '/img/favicon.ico', :rel => "shortcut icon", type: nil
+    = slls_favicon_tag '/img/favicon.ico', :rel => "shortcut icon", type: nil
+    link rel="apple-touch-icon" href="apple-touch-icon.png"
   = NEWLINE
   body id="#{current_page.data.id}" class="cat-#{current_page.data.category}"
     /- if build? 

@@ -3,7 +3,7 @@
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no,minimal-ui">
-    <title>新規サイト</title>
+    <title>Dokokara | どこから（東京メトロの駅に）入るのが近いかわかるアプリ</title>
     <meta name="keywords" content="">
     <meta name="description" content="">
     <meta http-equiv="X-UA-Compatible" content="IE=Edge, chrome=1">
@@ -22,12 +22,14 @@
     <script src="js/lib/notify.js"></script>
     <script src="js/lib/notify-bootstrap.js"></script>
     <script src="js/all.js"></script>
+    <link rel="shortcut icon" href="img/favicon.ico">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
   </head>
   
   <body id="index" class="cat-index">
     <header id="masthead">
       <section class="params">
-        <label class="param-address"><input id="param-address-input" data-bind="value: address, valueUpdate: 'keyup'" name="address" type="text">
+        <span class="param-address"><input id="param-address-input" data-bind="value: address, valueUpdate: 'keyup'" name="address" type="text">
           <div class="sgst-list" data-bind="visible: suggestion().length > 0">
             <ul data-bind="foreach: suggestion">
               <li data-bind="click: $.proxy($root.selectLocation, $root)">
@@ -35,7 +37,7 @@
               </li>
             </ul>
           </div>
-        </label><label class="param-radius"><button id="toggle-range" class="param-btn" type="button" ontouchstart=""><i class="fa fa-dot-circle-o"></i></button><input name="radius" size="6" id="param-radius-input" data-bind="value: radius, valueUpdate: 'keyup'" type="tel"><span class="units">(m)</span></label><label class="param-lat">lat<input name="lat" size="10" disabled="disabled" data-bind="value: lat, valueUpdate: 'keyup'" type="tel"></label><label class="param-lon">lon<input name="lon" size="10" disabled="disabled" data-bind="value: lon, valueUpdate: 'keyup'" type="tel"></label><button id="start-search" type="button" ontouchstart=""><i class="fa fa-search"></i></button><button id="current-location" class="param-btn" type="button"><i class="fa fa-crosshairs"></i></button>
+        </span><span class="param-radius"><button id="toggle-range" class="param-btn" type="button" ontouchstart=""><i class="fa fa-dot-circle-o"></i></button><input name="radius" size="6" id="param-radius-input" data-bind="value: radius, valueUpdate: 'keyup'" type="tel"><span class="units">(m)</span></span><label class="param-lat">lat<input name="lat" size="10" disabled="disabled" data-bind="value: lat, valueUpdate: 'keyup'" type="tel"></label><label class="param-lon">lon<input name="lon" size="10" disabled="disabled" data-bind="value: lon, valueUpdate: 'keyup'" type="tel"></label><button id="start-search" type="button" ontouchstart=""><i class="fa fa-search"></i></button><button id="current-location" class="param-btn" type="button"><i class="fa fa-crosshairs"></i></button>
       </section>
     </header>
     

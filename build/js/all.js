@@ -1604,12 +1604,16 @@ require([
         $(this).val(savedRange);
       }
     });
+    $('#param-radius-input').parent('label').on('click', function(e) {
+      e.stopPropagation();
+    });
 
     $('#start-search').on('click', function(e) {
       collectionVM.search(conditionVM.getAPIParams());
     });
 
-    $('#toggle-range').on('mouseup', function(e) {
+    $('#toggle-range').on('click', function(e) {
+
       conditionVM.toggleRange();
     });
 
