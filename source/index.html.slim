@@ -16,8 +16,8 @@ title: 新規サイト
   p.duration data-bind="text: '（' + duration() + '）'"
   /p data-bind="text: x() + ',' + y()"
 
-- if !build?
-  #poi-list
+#poi-list
+  - if !build?
     ul data-bind="foreach: points"
       li
         span data-bind="text: title"
