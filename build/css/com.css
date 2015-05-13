@@ -69,14 +69,6 @@ html, body {
   height: 100%;
 }
 
-@media (orientation: landscape) {
-  html.ios7 > body {
-    position: fixed;
-    bottom: 0;
-    width: 100%;
-    height: 320px !important;
-  }
-}
 body {
   width: 100%;
   font-size: 100%;
@@ -144,6 +136,28 @@ button {
 button:active {
   background: #E0E0E0;
 }
+button .icon {
+  display: inline-block;
+}
+button .now-loading {
+  display: none;
+  width: 28px;
+  height: 28px;
+}
+button .spinner {
+  width: 28px;
+  height: 28px;
+}
+button svg rect, button svg path {
+  fill: #999;
+}
+
+button[disabled] .icon {
+  display: none;
+}
+button[disabled] .now-loading {
+  display: inline-block;
+}
 
 button::-moz-focus-inner {
   padding: 0;
@@ -166,6 +180,55 @@ button::-moz-focus-inner {
   zoom: 1;
 }
 
+.loader {
+  box-sizing: border-box;
+  position: relative;
+  display: inline-block;
+  margin: 0 12.5% 100px;
+  width: 40px;
+  height: 40px;
+  border: 2px solid #29CA83;
+  border-top-width: 0;
+  border-radius: 50%;
+  -webkit-animation: spin 1s infinite linear;
+  animation: spin 1s infinite linear;
+}
+
+.loader::before,
+.loader::after {
+  box-sizing: border-box;
+  left: -2px;
+  top: -2px;
+  display: none;
+  position: absolute;
+  content: "";
+  width: inherit;
+  height: inherit;
+  border: inherit;
+  border-radius: inherit;
+}
+
+@-webkit-keyframes spin {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes spin {
+  from {
+    -webkit-transform: rotate(0deg);
+    transform: rotate(0deg);
+  }
+  to {
+    -webkit-transform: rotate(360deg);
+    transform: rotate(360deg);
+  }
+}
 /* ============================
  * 
  *     Header - #masthead
@@ -179,19 +242,17 @@ button::-moz-focus-inner {
   width: 100%;
   height: 50px;
   background: #FFF;
+  transition: height 0.25s cubic-bezier(1, 0, 0, 1);
 }
 
 .params {
-  padding: 7px;
-  padding-left: 57px;
+  padding: 7px 57px;
 }
-.params label, .params button, .params span {
+.params > * {
   position: relative;
   display: inline-block;
   vertical-align: middle;
   font-family: "Montserrat", sans-serif;
-}
-.params label, .params span {
   margin-right: 15px;
 }
 .params label > input {
@@ -245,13 +306,16 @@ button::-moz-focus-inner {
   top: 0;
   min-width: 50px;
   height: 50px;
-  background: #0085C0;
+  background: #29CA83;
   color: #FFF;
   font-size: 1.25rem;
   line-height: 120%;
 }
 #start-search:active {
-  background: #006a99;
+  background: #20a168;
+}
+#start-search .spinner rect, #start-search .spinner path {
+  fill: #FFF;
 }
 
 #current-location {
@@ -260,6 +324,7 @@ button::-moz-focus-inner {
   top: 0;
   min-width: 50px;
   height: 50px;
+  margin-right: 0;
   background: #E0E0E0;
   color: #000;
   font-size: 1.25rem;
@@ -267,6 +332,67 @@ button::-moz-focus-inner {
 }
 #current-location:active {
   background: #CCC;
+}
+
+.introduction-label {
+  display: none;
+}
+.introduction-label p {
+  color: #666;
+}
+
+.introduction #masthead {
+  height: 100%;
+}
+.introduction .masthead-wrapper {
+  position: absolute;
+  width: 320px;
+  margin: 0 auto;
+  left: 50%;
+  top: 50%;
+  margin-left: -160px;
+  margin-top: -160px;
+}
+.introduction .params {
+  padding: 0;
+  text-align: center;
+}
+.introduction .param-lat, .introduction .param-lon {
+  display: none;
+}
+.introduction #start-search {
+  position: relative;
+  width: 320px;
+  margin-top: 10px;
+  text-align: center;
+}
+.introduction .param-radius {
+  display: none;
+}
+.introduction #current-location {
+  position: relative;
+  width: 320px;
+  text-align: center;
+}
+.introduction .introduction-label {
+  display: block;
+  text-align: center;
+  padding: 7px;
+}
+
+.introduction-title {
+  margin-bottom: 10px;
+  text-align: center;
+  font-family: "Montserrat", sans-serif;
+  font-size: 2rem;
+  line-height: 140%;
+  color: #29CA83;
+}
+
+.introduction-desc {
+  font-size: 0.75rem;
+  line-height: 140%;
+  color: #999;
 }
 
 /* ============================
@@ -338,6 +464,23 @@ button::-moz-focus-inner {
 #poi-list.enabled ul {
   font-size: 0.625rem;
   line-height: 140%;
+}
+
+.preloading-cover {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 1000;
+  width: 100%;
+  height: 100%;
+  background: #FFF;
+}
+.preloading-cover .loader {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  margin-left: -20px;
+  margin-top: -20px;
 }
 
 /* ============================

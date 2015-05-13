@@ -3,32 +3,50 @@
 /
 
 header#masthead
-  section.params
-    span.param-address
-      = slls text_field_tag("address", id: "param-address-input", \
-      :'data-bind' => "value: address, valueUpdate: 'keyup'")
-      .sgst-list data-bind="visible: suggestion().length > 0"
-        ul data-bind="foreach: suggestion"
-          li data-bind="click: $.proxy($root.selectLocation, $root)"
-            p data-bind="text: address"
-    span.param-radius
-      button#toggle-range.param-btn type="button" ontouchstart=""
-        i.fa.fa-dot-circle-o
-      = slls telephone_field_tag("radius", size: 6, id: "param-radius-input", \
-      :'data-bind' => "value: radius, valueUpdate: 'keyup'")
-      span.units
-        | (m)
-    label.param-lat
-      | lat
-      = slls telephone_field_tag("lat", size: 10, disabled: true, \
-      :'data-bind' => "value: lat, valueUpdate: 'keyup'")
-    label.param-lon
-      | lon
-      = slls telephone_field_tag("lon", size: 10, disabled: true, \
-      :'data-bind' => "value: lon, valueUpdate: 'keyup'")
-    button#start-search type="button" ontouchstart=""
-      i.fa.fa-search
-    button#current-location.param-btn type="button"
-      i.fa.fa-crosshairs
+  .masthead-wrapper
+    section.params
+      div.introduction-label
+        h1.introduction-title
+          | Dokokara.info
+        p
+          | 住所から検索
+      span.param-address
+        = slls text_field_tag("address", id: "param-address-input", \
+        :'data-bind' => "value: address, valueUpdate: 'keyup'")
+        .sgst-list data-bind="visible: suggestion().length > 0"
+          ul data-bind="foreach: suggestion"
+            li data-bind="click: $.proxy($root.selectLocation, $root)"
+              p data-bind="text: address"
+      span.param-radius
+        button#toggle-range.param-btn type="button" ontouchstart=""
+          i.fa.fa-dot-circle-o
+        = slls telephone_field_tag("radius", size: 6, id: "param-radius-input", \
+        :'data-bind' => "value: radius, valueUpdate: 'keyup'")
+        span.units
+          | (m)
+      label.param-lat
+        | lat
+        = slls telephone_field_tag("lat", size: 10, disabled: true, \
+        :'data-bind' => "value: lat, valueUpdate: 'keyup'")
+      label.param-lon
+        | lon
+        = slls telephone_field_tag("lon", size: 10, disabled: true, \
+        :'data-bind' => "value: lon, valueUpdate: 'keyup'")
+      button#start-search type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByParams() }"
+        i.fa.fa-search.icon
+        span.now-loading
+          = partial "spinner"
+      div.introduction-label
+        p
+          | または、現在地から検索
+      button#current-location.param-btn type="button" data-bind="attr: { disabled: !!isSearchByGeo() }"
+        i.fa.fa-crosshairs.icon
+        span.now-loading
+          = partial "spinner"
+      div.introduction-label.introduction-desc
+        p
+          | Dokokara.infoはどこから（東京メトロの駅に）入るのが近いかわかるアプリです。
+          | 東京メトロAPI
+          | の地物情報から出入口の情報を取得します。
 
 = NEWLINE

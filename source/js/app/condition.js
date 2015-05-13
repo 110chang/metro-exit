@@ -49,6 +49,8 @@ define([
     this.address = ko.observable(data.address);
     this.radius = ko.observable(data.radius);
     this.suggestion = ko.observableArray([]);
+    this.isSearchByParams = ko.observable(false);
+    this.isSearchByGeo = ko.observable(false);
 
     this.addressSubscription = this.address.subscribe(this.getLatLng, this);
 
@@ -57,6 +59,10 @@ define([
   extend(ConditionVM.prototype, {
     startSearch: function() {
       console.log('ConditionVM#startSearch');
+    },
+    clearStats: function() {
+      this.isSearchByParams(false);
+      this.isSearchByGeo(false);
     },
     setLatLng: function(lat, lon) {
       console.log('ConditionVM#setLatLng');
@@ -123,6 +129,9 @@ define([
         tmp = targetRanges[0];
       }
       this.radius(tmp);
+    },
+    hideSuggestion: function() {
+      this.suggestion([]);
     }
   });
   

@@ -119,6 +119,7 @@ define([
     },
     update: function(points) {
       console.log('Map#update');
+      points = points || [];
       this.clearRoute();
       // remove existing markers
       this.markers.forEach(function(marker, i) {
@@ -153,6 +154,9 @@ define([
       this.rangeCircle.setRadius(ConditionVM().radius() * 1);
 
       //this.map.fitBounds(this.rangeCircle.getBounds());
+      if (points.length === 0) {
+        bounds = this.rangeCircle.getBounds();
+      }
       this.map.fitBounds(bounds);
     }
   });

@@ -41,10 +41,8 @@ define([
     },
     success: function(pos) {
       console.log('Geolocation#success');
-      //this.lat = pos.coords.latitude;
-      //this.lon = pos.coords.longitude;
-      this.lat = 35.684378;//test code
-      this.lon = 139.738338;//test code
+      this.lat = pos.coords.latitude;//35.684378;//test code
+      this.lon = pos.coords.longitude;//139.738338;//test code
       $(window).trigger('onGeolocationSuccess');
     },
     error: function(error) {

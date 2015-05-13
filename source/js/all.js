@@ -831,6 +831,8 @@ define('app/condition',[
     this.address = ko.observable(data.address);
     this.radius = ko.observable(data.radius);
     this.suggestion = ko.observableArray([]);
+    this.isSearchByParams = ko.observable(false);
+    this.isSearchByGeo = ko.observable(false);
 
     this.addressSubscription = this.address.subscribe(this.getLatLng, this);
 
@@ -839,6 +841,10 @@ define('app/condition',[
   extend(ConditionVM.prototype, {
     startSearch: function() {
       console.log('ConditionVM#startSearch');
+    },
+    clearStats: function() {
+      this.isSearchByParams(false);
+      this.isSearchByGeo(false);
     },
     setLatLng: function(lat, lon) {
       console.log('ConditionVM#setLatLng');
@@ -905,6 +911,9 @@ define('app/condition',[
         tmp = targetRanges[0];
       }
       this.radius(tmp);
+    },
+    hideSuggestion: function() {
+      this.suggestion([]);
     }
   });
   
@@ -1244,6 +1253,7 @@ define('app/map',[
     },
     update: function(points) {
       console.log('Map#update');
+      points = points || [];
       this.clearRoute();
       // remove existing markers
       this.markers.forEach(function(marker, i) {
@@ -1278,6 +1288,9 @@ define('app/map',[
       this.rangeCircle.setRadius(ConditionVM().radius() * 1);
 
       //this.map.fitBounds(this.rangeCircle.getBounds());
+      if (points.length === 0) {
+        bounds = this.rangeCircle.getBounds();
+      }
       this.map.fitBounds(bounds);
     }
   });
@@ -1379,10 +1392,8 @@ define('app/geolocation',[
     },
     success: function(pos) {
       console.log('Geolocation#success');
-      //this.lat = pos.coords.latitude;
-      //this.lon = pos.coords.longitude;
-      this.lat = 35.684378;//test code
-      this.lon = 139.738338;//test code
+      this.lat = pos.coords.latitude;//35.684378;//test code
+      this.lon = pos.coords.longitude;//139.738338;//test code
       $(window).trigger('onGeolocationSuccess');
     },
     error: function(error) {
@@ -1580,6 +1591,12 @@ require([
       });
     }
   }
+  function showCover() {
+    $('.preloading-cover').fadeIn(250);
+  }
+  function hideCover() {
+    $('.preloading-cover').fadeOut(500);
+  }
 
   $(function() {
     //console.log('DOM ready.');
@@ -1614,8 +1631,11 @@ require([
     stashInputValue($('#param-radius-input'));
 
     $('#start-search').on('click', function(e) {
+      console.log('%cMain#startSearchClicked', 'background: yellow');
       $.notify('出入口情報を取得しています', 'info');
       collectionVM.search(conditionVM.getAPIParams());
+      conditionVM.isSearchByParams(true);
+      $('html').removeClass('introduction');
     });
 
     $('#toggle-range').on('click', function(e) {
@@ -1623,8 +1643,10 @@ require([
     });
 
     $('#current-location').on('click', function(e) {
+      console.log('%cMain#currentLocaitonClicked', 'background: yellow');
       $.notify('現在地を確認しています', 'info');
       geolocation.getCurrent();
+      conditionVM.isSearchByGeo(true);
     });
 
     $('#distance').on('click', function(e) {
@@ -1632,10 +1654,20 @@ require([
       map.clearRoute();
     });
 
-    // Gray area visible using iOS 7.1 minimal-ui
+    // use enter key for start search
+    // keyupだと未確定文字がある状態でも発火するのでkeydownにする
+    // http://qiita.com/hnakamur/items/9a9ca2663285e19088c7
+    $('#masthead').on('keydown', function(e) {
+      //console.log(e.keyCode);
+      if (e.keyCode === 13) {
+        $('#start-search').trigger('click');
+      }
+    });
+
+    // Gray area visible in iOS 7.1 using minimal-ui
     // via http://stackoverflow.com/questions/22391157/gray-area-visible-when-switching-from-portrait-to-landscape-using-ios-7-1-minima
     if (navigator.userAgent.match(/(iPad|iPod|iPhone);.*CPU.*OS 7_\d/i)) {
-      console.log(navigator.userAgent);
+      //console.log(navigator.userAgent);
       $(window).on('reducedResize', function(e) {
         window.scrollTo(0,1);
       });
@@ -1652,8 +1684,10 @@ require([
         map.update(collectionVM.points());
         $.notify('出入口情報を取得しました', 'info');
       } else {
+        map.update();
         $.notify('出入口情報はありません', 'warn');
       }
+      conditionVM.clearStats();
     });
     $(window).on('onMetroAPIFail', function(e) {
       $.notify('出入口情報を取得できませんでした', 'error');
@@ -1661,6 +1695,7 @@ require([
 
     // Googlemap Directions API
     $(window).on('onDirectionsFind', function(e) {
+      conditionVM.hideSuggestion();
       //$.notify('経路を取得しました', 'info');
     });
     $(window).on('onNoDirectionsFind', function(e) {
@@ -1669,8 +1704,9 @@ require([
 
     // HTML5 Geolocation API
     $(window).on('onGeolocationSuccess', function(e) {
+      //console.log('Main#onGeolocationSuccess');
       conditionVM.getAddress(geolocation.lat, geolocation.lon);
-      collectionVM.search(conditionVM.getAPIParams());
+      $('html').removeClass('introduction');
       $.notify('現在地を取得しました', 'info');
     });
     $(window).on('onGeolocationFail', function(e) {
@@ -1678,7 +1714,8 @@ require([
     });
 
     // initialize POI
-    collectionVM.search(conditionVM.getAPIParams());
+    //collectionVM.search(conditionVM.getAPIParams());
+    hideCover();
   });
 });
 
