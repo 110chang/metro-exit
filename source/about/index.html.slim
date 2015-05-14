@@ -1,0 +1,65 @@
+---
+id: about
+category: about
+layout: layout
+title: Dokokara | どこから（東京メトロの駅に）入るのが近いかわかるアプリ
+---
+
+/
+/ About
+/
+
+.layout-wrapper
+  section.section-major
+    section.section-contents
+      h1.section-title
+        | About
+      p
+        span.site-name
+          | Dokokara.info
+        | はどこから（東京メトロの駅に）入るのが近いかわかるアプリです。
+        | 東京メトロAPI
+        | の地物情報から出入口の情報を取得します。
+      p
+        | 入力した住所、もしくはデバイスの位置から一定の範囲にある東京メトロの出入口を検索できます。
+      p
+        | 本アプリは以下の外部のAPIを利用します。
+      ul.api-list
+        li
+          | 東京メトロAPI
+        li
+          | Google Maps API
+        li
+          | Google Directions API
+        li
+          | Google Geocoding API
+      p
+        | 本アプリは各ブラウザの最新版で動作を確認しております。
+      p.notes
+        | ※Android標準ブラウザはAndroid 4.1にて動作を確認しております。
+
+    section.section-contents
+      h1.section-title
+        | Terms of use
+      p
+        strong.warn 東京メトロAPIの地物情報に登録されている以外の出入口は検索できません
+        | のでご了承ください。
+      p
+        | ルート表示は住所、あるいは緯度・経度から検索した目安です。
+        strong.warn
+          | 実際の建造物の出入口が近いとは限りません
+        | ので、現地の状況をよく確認の上ご利用ください。
+      p
+        | 本アプリを利用したことによる、いかなる損害も負いかねます。
+      p
+        | ご意見、ご要望は
+        - link_to "https://twitter.com/110chang", class: "author-link"
+          | @110chang
+        | まで。
+
+    ul.raise-actions
+      li
+        - link_to "/index.html", class: "button-skin button-skin--green"
+          i.fa.fa-chevron-left
+          span.button-label
+            | アプリに戻る

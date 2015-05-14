@@ -5,11 +5,13 @@
 header#masthead
   .masthead-wrapper
     section.params
-      div.introduction-label
+      
+      / アプリタイトル
+      div.introduction-only
         h1.introduction-title
           | Dokokara.info
-        p
-          | 住所から検索
+      
+      / 住所
       span.param-address
         = slls text_field_tag("address", id: "param-address-input", \
         :'data-bind' => "value: address, valueUpdate: 'keyup'")
@@ -17,36 +19,62 @@ header#masthead
           ul data-bind="foreach: suggestion"
             li data-bind="click: $.proxy($root.selectLocation, $root)"
               p data-bind="text: address"
+
+      / 検索半径
       span.param-radius
-        button#toggle-range.param-btn type="button" ontouchstart=""
+        button#toggle-range.button-skin type="button" ontouchstart=""
           i.fa.fa-dot-circle-o
         = slls telephone_field_tag("radius", size: 6, id: "param-radius-input", \
         :'data-bind' => "value: radius, valueUpdate: 'keyup'")
         span.units
           | (m)
+
+      / 緯度
       label.param-lat
         | lat
         = slls telephone_field_tag("lat", size: 10, disabled: true, \
         :'data-bind' => "value: lat, valueUpdate: 'keyup'")
+      
+      / 経度
       label.param-lon
         | lon
         = slls telephone_field_tag("lon", size: 10, disabled: true, \
         :'data-bind' => "value: lon, valueUpdate: 'keyup'")
-      button#start-search type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByParams() }"
-        i.fa.fa-search.icon
-        span.now-loading
+
+      / 情報
+      span.show-info-minimal
+        - link_to "/about/index.html", class: "button-skin"
+          i.fa.fa-info-circle
+
+      / 検索ボタン
+      button#start-search.button-skin.param-btn type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByParams() }"
+        i.fa.fa-search.button-icon
+        span.button-now-loading
           = partial "spinner"
-      div.introduction-label
-        p
-          | または、現在地から検索
-      button#current-location.param-btn type="button" data-bind="attr: { disabled: !!isSearchByGeo() }"
-        i.fa.fa-crosshairs.icon
-        span.now-loading
+        span.button-label.introduction-only
+          | 住所から検索
+
+      / 現在地ボタン
+      button#current-location.button-skin.param-btn type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByGeo() }"
+        i.fa.fa-crosshairs.button-icon
+        span.button-now-loading
           = partial "spinner"
-      div.introduction-label.introduction-desc
+        span.button-label.introduction-only
+          | 現在地から検索
+
+      / 説明
+      span.introduction-desc.introduction-only
         p
-          | Dokokara.infoはどこから（東京メトロの駅に）入るのが近いかわかるアプリです。
+          | どこから（東京メトロの駅に）入るのが近いかわかるアプリです。
           | 東京メトロAPI
-          | の地物情報から出入口の情報を取得します。
+          | の出入口情報を取得します。
+
+      / 情報（イントロ用）
+      span.show-info
+        - link_to "/about/index.html", class: "button-skin"
+          i.fa.fa-info-circle
+          span.button-label.introduction-only
+            | このアプリについて
+
 
 = NEWLINE

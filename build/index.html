@@ -21,7 +21,7 @@
     <script src="js/lib/jquery.easing.js"></script>
     <script src="js/lib/notify.js"></script>
     <script src="js/lib/notify-bootstrap.js"></script>
-    <script src="js/all.js"></script>
+    <script src="js/all-index.js"></script>
     <link rel="shortcut icon" href="img/favicon.ico">
     <link rel="apple-touch-icon" href="img/apple-touch-icon.png">
   </head>
@@ -30,13 +30,10 @@
     <header id="masthead">
       <div class="masthead-wrapper">
         <section class="params">
-          <div class="introduction-label">
+          <div class="introduction-only">
             <h1 class="introduction-title">
               Dokokara.info
             </h1>
-            <p>
-              住所から検索
-            </p>
           </div>
           <span class="param-address"><input id="param-address-input" data-bind="value: address, valueUpdate: 'keyup'" name="address" type="text">
             <div class="sgst-list" data-bind="visible: suggestion().length > 0">
@@ -46,7 +43,7 @@
                 </li>
               </ul>
             </div>
-          </span><span class="param-radius"><button id="toggle-range" class="param-btn" type="button" ontouchstart=""><i class="fa fa-dot-circle-o"></i></button><input name="radius" size="6" id="param-radius-input" data-bind="value: radius, valueUpdate: 'keyup'" type="tel"><span class="units">(m)</span></span><label class="param-lat">lat<input name="lat" size="10" disabled="disabled" data-bind="value: lat, valueUpdate: 'keyup'" type="tel"></label><label class="param-lon">lon<input name="lon" size="10" disabled="disabled" data-bind="value: lon, valueUpdate: 'keyup'" type="tel"></label><button id="start-search" type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByParams() }"><i class="fa fa-search icon"></i><span class="now-loading">
+          </span><span class="param-radius"><button id="toggle-range" class="button-skin" type="button" ontouchstart=""><i class="fa fa-dot-circle-o"></i></button><input name="radius" size="6" id="param-radius-input" data-bind="value: radius, valueUpdate: 'keyup'" type="tel"><span class="units">(m)</span></span><label class="param-lat">lat<input name="lat" size="10" disabled="disabled" data-bind="value: lat, valueUpdate: 'keyup'" type="tel"></label><label class="param-lon">lon<input name="lon" size="10" disabled="disabled" data-bind="value: lon, valueUpdate: 'keyup'" type="tel"></label><span class="show-info-minimal"><a class="button-skin" href="about/"><i class="fa fa-info-circle"></i></a></span><button id="start-search" class="button-skin param-btn" type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByParams() }"><i class="fa fa-search button-icon"></i><span class="button-now-loading">
               <svg version="1.1" class="spinner" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                  width="40px" height="40px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
               <path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
@@ -58,13 +55,7 @@
                   dur="1s"
                   repeatCount="indefinite"/>
                 </path>
-              </svg></span></button>
-          <div class="introduction-label">
-            <p>
-              または、現在地から検索
-            </p>
-          </div>
-          <button id="current-location" class="param-btn" type="button" data-bind="attr: { disabled: !!isSearchByGeo() }"><i class="fa fa-crosshairs icon"></i><span class="now-loading">
+              </svg></span><span class="button-label introduction-only">住所から検索</span></button><button id="current-location" class="button-skin param-btn" type="button" ontouchstart="" data-bind="attr: { disabled: !!isSearchByGeo() }"><i class="fa fa-crosshairs button-icon"></i><span class="button-now-loading">
               <svg version="1.1" class="spinner" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
                  width="40px" height="40px" viewBox="0 0 50 50" style="enable-background:new 0 0 50 50;" xml:space="preserve">
               <path fill="#000" d="M43.935,25.145c0-10.318-8.364-18.683-18.683-18.683c-10.318,0-18.683,8.365-18.683,18.683h4.068c0-8.071,6.543-14.615,14.615-14.615c8.072,0,14.615,6.543,14.615,14.615H43.935z">
@@ -76,12 +67,11 @@
                   dur="1s"
                   repeatCount="indefinite"/>
                 </path>
-              </svg></span></button>
-          <div class="introduction-label introduction-desc">
+              </svg></span><span class="button-label introduction-only">現在地から検索</span></button><span class="introduction-desc introduction-only">
             <p>
-              Dokokara.infoはどこから（東京メトロの駅に）入るのが近いかわかるアプリです。東京メトロAPIの地物情報から出入口の情報を取得します。
+              どこから（東京メトロの駅に）入るのが近いかわかるアプリです。東京メトロAPIの出入口情報を取得します。
             </p>
-          </div>
+          </span><span class="show-info"><a class="button-skin" href="about/"><i class="fa fa-info-circle"></i><span class="button-label introduction-only">このアプリについて</span></a></span>
         </section>
       </div>
     </header>

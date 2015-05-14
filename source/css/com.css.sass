@@ -40,7 +40,7 @@ strong
   font-weight: bold
 
 a
-  //+link-colors(#FFF, #F60, #F60, #FFF, #F60)//n-h-a-v-f
+  +link-colors($key-color, $key-color-light, $key-color-light, $key-color, $key-color-light)//n-h-a-v-f
 
 input
   font-size: 100%
@@ -61,7 +61,7 @@ textarea
 
 input[type=tel]
   text-align: right
-  font-family: "Montserrat", sans-serif
+  +use-montserrat()
 
 input[disabled]
   background: #F7F7F7
@@ -70,42 +70,59 @@ input[disabled]
 input.placeholder
   color: #999
 
-button
+button::-moz-focus-inner
+  padding: 0
+  border: none
+
+
+.button-skin
   -moz-appearance: none
   -webkit-appearance: none
   appearance: none
+  box-sizing: border-box
+  display: inline-block
   margin: 0
-  padding: 0.1em 0.3em
+  padding: 0.3em 0.5em
   background: transparent
   //background: #FCC
   color: #000
   border: 0
   font-size: 1.125rem
   line-height: 140%
+  vertical-align: middle
+  text-decoration: none
+  cursor: pointer
   &:active
     background: #E0E0E0
-  .icon
-    display: inline-block
-  .now-loading
-    display: none
-    width: 28px
-    height: 28px
-  .spinner
-    width: 28px
-    height: 28px
   svg
     rect, path
       fill: #999
+.button-icon
+  display: inline-block
+.button-now-loading
+  display: none
+  width: 26px
+  height: 26px
+  .spinner
+    width: 26px
+    height: 26px
+.button-label
+  display: inline-block
+  margin-left: 0.25em
 
-button[disabled]
-  .icon
+button.button-skin[disabled]
+  cursor: default
+  .button-icon
     display: none
-  .now-loading
+  .button-now-loading
     display: inline-block
+  .button-label
+    display: none
 
-button::-moz-focus-inner
-  padding: 0
-  border: none
+.button-skin--green
+  +use-key-background()
+  +link-colors(#FFF, $key-color-pale, $key-color-pale, #FFF, $key-color-pale)//n-h-a-v-f
+
 
 +micro-clearfix()
 
@@ -117,7 +134,7 @@ button::-moz-focus-inner
   margin: 0 12.5% 100px
   width: 40px
   height: 40px
-  border: 2px solid #29CA83
+  border: 2px solid $key-color
   border-top-width: 0
   border-radius: 50%
   animation: spin 1s infinite linear
@@ -158,25 +175,26 @@ button::-moz-focus-inner
   background: #FFF
   transition: height 0.25s cubic-bezier(1,0,0,1)
 
-.params 
-  //padding: 7px
+.masthead-wrapper
+  position: relative
+  width: 100%
+  margin: 0
+
+.params
+  display: block
   padding: 7px 57px
   &>*
     position: relative
     display: inline-block
-    vertical-align: middle
-    font-family: "Montserrat", sans-serif
     margin-right: 15px
+    vertical-align: middle
+    +use-montserrat()
   label>input
-    margin-left: 0.1em
+    margin-left: 0.2em
   .units
     margin-left: 0.2em
     font-size: 0.75rem
     line-height: 140%
-
-.param-btn
-  width: 40px
-  height: 40px
 
 .sgst-list
   box-sizing: border-box
@@ -197,48 +215,61 @@ button::-moz-focus-inner
     border-radius: 2px
     cursor: pointer
   li:hover
-    background: #0085C0
-    color: #FFF
+    +use-key-background()
 
 .param-lat, .param-lon
   font-size: 0.875rem
   line-height: 140%
   color: #999
 
-#start-search
+.param-btn
+  display: block
   position: absolute
   left: 0
   top: 0
   min-width: 50px
   height: 50px
-  background: #29CA83//#0085C0
-  color: #FFF
+  font-size: 1.25rem
+  line-height: 120%
+
+#start-search
+  +use-key-background()
   font-size: 1.25rem
   line-height: 120%
   &:active
-    background: shade(#29CA83, 20)
+    background: shade($key-color, 20)
   .spinner
     rect, path
       fill: #FFF
 
 #current-location
-  position: absolute
+  left: auto
   right: 0
-  top: 0
-  min-width: 50px
-  height: 50px
   margin-right: 0
   background: #E0E0E0
   color: #000
-  font-size: 1.25rem
-  line-height: 120%
   &:active
     background: #CCC
 
-.introduction-label
+.show-info
   display: none
-  p
-    color: #666
+
+.introduction-only
+  display: none
+
+.introduction-title
+  margin-bottom: 20px
+  text-align: center
+  font-size: 2rem
+  line-height: 140%
+  +use-key-color()
+  +use-montserrat()
+
+.introduction-desc
+  font-size: 0.75rem
+  line-height: 140%
+  color: #999
+
 
 .introduction
   #masthead
@@ -250,44 +281,35 @@ button::-moz-focus-inner
     left: 50%
     top: 50%
     margin-left: -160px
-    margin-top: -160px
+    margin-top: -180px
   .params
     padding: 0
     text-align: center
   .param-lat, .param-lon
     display: none
 
-  #start-search
+  .param-btn
+    display: block
     position: relative
     width: 320px
-    margin-top: 10px
+    margin: 10px 0
     text-align: center
 
   .param-radius
     display: none
 
-  #current-location
-    position: relative
-    width: 320px
-    text-align: center
+  .show-info-minimal
+    display: none
 
-  .introduction-label
+  .show-info
     display: block
-    text-align: center
-    padding: 7px
+    position: relative
+    right: auto
+    top: auto
+    margin-top: 10px
 
-.introduction-title
-  margin-bottom: 10px
-  text-align: center
-  font-family: "Montserrat", sans-serif
-  font-size: 2rem
-  line-height: 140%
-  color: #29CA83
-
-.introduction-desc
-  font-size: 0.75rem
-  line-height: 140%
-  color: #999
+  .introduction-only
+    display: inline-block
 
 /* ============================
  * 
@@ -313,13 +335,16 @@ button::-moz-focus-inner
   bottom: 50px
   width: 100%
   margin-bottom: -4em
-  padding: 0.75em 0
-  background: rgba(0, 133, 192, 0.9)//#0085C0
-  color: #FFF
+  padding: 0.5em 0
+  //background: rgba(0, 133, 192, 0.9)//#0085C0
+  //background: rgba(41, 202, 131, 0.9)//#29CA83
+  background: rgba(0, 0, 0, 0.8)
+  color: $key-color
   text-align: center
+  cursor: pointer
   transition: margin-bottom 0.25s cubic-bezier(1,0,0,1)
   .distance
-    font-family: "Montserrat", sans-serif
+    +use-montserrat()
   .duration
     font-size: 0.75rem
     line-height: 140%
@@ -330,7 +355,7 @@ button::-moz-focus-inner
     width: 50px
     height: 50px
     font-size: 1.25rem
-    line-height: 2.1em
+    line-height: 1.8em
 
 #distance.show
   margin-bottom: 0
@@ -365,6 +390,59 @@ button::-moz-focus-inner
     margin-left: -20px
     margin-top: -20px
 
+.layout-wrapper
+  box-sizing: border-box
+  width: 100%
+  max-width: 980px
+  margin: 0 auto
+  padding: 20px 20px 40px
+
+.section-major
+  &>*
+    margin: 40px 0
+    &:first-child
+      margin-top: 0
+    &:last-child
+      margin-bottom: 0
+
+.section-title
+  +use-montserrat()
+  +use-key-color()
+  font-size: 1.5rem
+  line-height: 120%
+
+.section-contents
+  &>*
+    margin: 1em 0
+    &:first-child
+      margin-top: 0
+    &:last-child
+      margin-bottom: 0
+
+.site-name
+  +use-montserrat()
+  +use-key-color()
+
+.api-list
+  li
+    &:before
+      content: "_"
+      color: #999
+
+.author-link
+  +use-montserrat()
+
+.warn
+  color: $color-warn
+
+.notes
+  font-size: 0.75rem
+  line-height: 140%
+
+.raise-actions
+  text-align: center
+  &>*
+    display: inline-block
 
 /* ============================
  * 
@@ -376,7 +454,7 @@ button::-moz-focus-inner
   width: 100%
 
 
-@media screen and (max-width: 767px)
+@media screen and (max-width: 1023px)
   .params
     .param-lat
       display: none
@@ -407,6 +485,10 @@ button::-moz-focus-inner
     height: 80px
     font-size: 1.5rem
     line-height: 120%
+
+  .introduction-desc
+    margin-left: 10px
+    margin-right: 10px
 
   #main
     padding-bottom: 80px
