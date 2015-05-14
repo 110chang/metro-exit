@@ -609,7 +609,7 @@ button.button-skin[disabled] .button-label {
   display: inline-block;
 }
 
-.social-buttons {
+.social-buttons .fb-like > span {
   vertical-align: top;
 }
 
