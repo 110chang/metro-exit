@@ -64,8 +64,8 @@ html.introduction lang="ja"
     = slls_favicon_tag "/img/apple-touch-icon.png", rel: "apple-touch-icon", type: nil
   = NEWLINE
   body id="#{current_page.data.id}" class="cat-#{current_page.data.category}"
-    - if build? 
-      = partial 'facebook_root_tags'
+    /- if build? 
+    /  = partial 'facebook_root_tags'
     = partial "header"
     article#main
       = yield
