@@ -1629,13 +1629,14 @@ require([
     var collectionVM = new POICollectionVM();
     ko.applyBindings(collectionVM, $('#poi-list').get(0));
 
-    var map = new Map('#gmap');
-
     var distanceVM = new DistanceVM();
     ko.applyBindings(distanceVM, $('#distance').get(0));
 
     // geolocation
     var geolocation = new Geolocation();
+
+    // map (create at finish introduction)
+    var map;// = new Map('#gmap');
 
     //
     // add DOM events
@@ -1647,10 +1648,13 @@ require([
 
     $('#start-search').on('click', function(e) {
       console.log('%cMain#startSearchClicked', 'background: yellow');
-      $.notify('出入口情報を取得しています', 'info');
+      if (map == null) {
+        map = new Map('#gmap');
+      }
       collectionVM.search(conditionVM.getAPIParams());
       conditionVM.isSearchByParams(true);
       $('html').removeClass('introduction');
+      $.notify('出入口情報を取得しています', 'info');
     });
 
     $('#toggle-range').on('click', function(e) {
@@ -1659,9 +1663,9 @@ require([
 
     $('#current-location').on('click', function(e) {
       console.log('%cMain#currentLocaitonClicked', 'background: yellow');
-      $.notify('現在地を確認しています', 'info');
       geolocation.getCurrent();
       conditionVM.isSearchByGeo(true);
+      $.notify('現在地を確認しています', 'info');
     });
 
     $('#distance').on('click', function(e) {
