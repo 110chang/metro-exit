@@ -63,3 +63,24 @@ title: Dokokara | どこから（東京メトロの駅に）入るのが近い�
           i.fa.fa-chevron-left
           span.button-label
             | アプリに戻る
+
+    - if build?
+      ul.raise-actions
+        li
+          a href="https://twitter.com/share" class="twitter-share-button"
+            | Tweet
+          javascript:
+            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0],p=/^http:/.test(d.location)?'http':'https';if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src=p+'://platform.twitter.com/widgets.js';fjs.parentNode.insertBefore(js,fjs);}}(document, 'script', 'twitter-wjs');
+        li
+          div class="fb-like" data-href="http://dokokara.info/about/" data-layout="button_count" data-action="like" data-show-faces="false" data-share="false"
+
+        //li
+          a href='http://cloud.feedly.com/#subscription%2Ffeed%2Fhttp%3A%2F%2Fdokokara.info'  target='blank'
+            img id='feedlyFollow' src='http://s3.feedly.com/img/follows/feedly-follow-rectangle-flat-small_2x.png' alt='follow us in feedly' width='66' height='20'
+        //li
+          a data-pocket-label="pocket" data-pocket-count="horizontal" class="pocket-btn" data-lang="en"
+          javascript:
+            !function(d,i){if(!d.getElementById(i)){var j=d.createElement("script");j.id=i;j.src="https://widgets.getpocket.com/v1/j/btn.js?v=1";var w=d.getElementById(i);d.body.appendChild(j);}}(document,"pocket-btn-js");
+
+
+/
