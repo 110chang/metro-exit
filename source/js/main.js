@@ -14,7 +14,7 @@ requirejs.config({
 
 require([], function() {
   $(function() {
-    console.log('DOM ready.');
+    //console.log('DOM ready.');
   });
 });
 

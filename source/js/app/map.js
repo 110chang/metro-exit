@@ -9,9 +9,10 @@
 define([
   'knockout',
   'mod/extend',
+  'app/config',
   'app/condition',
   'app/directions'
-], function(ko, extend, ConditionVM, Directions) {
+], function(ko, extend, CFG, ConditionVM, Directions) {
   var exitIcon = {
     url: '../img/ico_exit.png',
     scaledSize : new google.maps.Size(22, 40),
@@ -49,8 +50,8 @@ define([
 
     // initialize range circle
     this.rangeCircle = new google.maps.Circle({
-      strokeColor: "#005BB7",
-      strokeOpacity: 0.5,
+      strokeColor: CFG.color.key,
+      strokeOpacity: 0.8,
       strokeWeight: 1,
       fillOpacity: 0,
       map: this.map,

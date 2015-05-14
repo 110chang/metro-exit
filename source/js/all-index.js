@@ -963,6 +963,28 @@ define('app/poi',[
 
 /*
 *
+*   Config
+*
+*   @author Yuji Ito @110chang
+*
+*/
+
+define('app/config',[], function() {
+  return {
+    color: {
+      key: '#29CA83',//42,202,131
+      dark: '#1F9862',//31,152,98
+      light: '#7EE0B4',//126,224,180
+      pale: '#A9EACD',//169,234,205
+      warn: '#F65855',
+      attn: '#FFE970',
+      info: '#0085C0'
+    }
+  };
+});
+
+/*
+*
 *   DistanceVM
 *
 *   @author Yuji Ito @110chang
@@ -1033,13 +1055,14 @@ define('app/distance',[
 define('app/directions',[
   'knockout',
   'mod/extend',
+  'app/config',
   'app/distance'
-], function(ko, extend, DistanceVM) {
+], function(ko, extend, CFG, DistanceVM) {
   var renderOpt = {
     preserveViewport: true,
     suppressMarkers: true,
     polylineOptions: {
-      strokeColor: '#005BB7',
+      strokeColor: CFG.color.info,
       strokeOpacity: 0.8,
       strokeWeight: 4
     }
@@ -1048,18 +1071,6 @@ define('app/directions',[
   function Directions(map) {
     this.map = map;
     this.service = new google.maps.DirectionsService();
-    //this.display = new google.maps.DirectionsRenderer(renderOpt);
-    //this.display.setMap(map);
-
-    // distance circle
-    this.distCircle = new google.maps.Circle({
-      fillColor: "#005BB7",
-      strokeOpacity: 0,
-      strokeWeight: 0,
-      fillOpacity: 1,
-      map: map,
-      radius: 10
-    });
 
     // distance VM
     this.distanceVM = DistanceVM();
@@ -1143,9 +1154,10 @@ define('app/directions',[
 define('app/map',[
   'knockout',
   'mod/extend',
+  'app/config',
   'app/condition',
   'app/directions'
-], function(ko, extend, ConditionVM, Directions) {
+], function(ko, extend, CFG, ConditionVM, Directions) {
   var exitIcon = {
     url: '../img/ico_exit.png',
     scaledSize : new google.maps.Size(22, 40),
@@ -1183,8 +1195,8 @@ define('app/map',[
 
     // initialize range circle
     this.rangeCircle = new google.maps.Circle({
-      strokeColor: "#005BB7",
-      strokeOpacity: 0.5,
+      strokeColor: CFG.color.key,
+      strokeOpacity: 0.8,
       strokeWeight: 1,
       fillOpacity: 0,
       map: this.map,

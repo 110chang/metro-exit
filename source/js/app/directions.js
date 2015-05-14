@@ -9,13 +9,14 @@
 define([
   'knockout',
   'mod/extend',
+  'app/config',
   'app/distance'
-], function(ko, extend, DistanceVM) {
+], function(ko, extend, CFG, DistanceVM) {
   var renderOpt = {
     preserveViewport: true,
     suppressMarkers: true,
     polylineOptions: {
-      strokeColor: '#005BB7',
+      strokeColor: CFG.color.info,
       strokeOpacity: 0.8,
       strokeWeight: 4
     }
@@ -24,18 +25,6 @@ define([
   function Directions(map) {
     this.map = map;
     this.service = new google.maps.DirectionsService();
-    //this.display = new google.maps.DirectionsRenderer(renderOpt);
-    //this.display.setMap(map);
-
-    // distance circle
-    this.distCircle = new google.maps.Circle({
-      fillColor: "#005BB7",
-      strokeOpacity: 0,
-      strokeWeight: 0,
-      fillOpacity: 1,
-      map: map,
-      radius: 10
-    });
 
     // distance VM
     this.distanceVM = DistanceVM();
