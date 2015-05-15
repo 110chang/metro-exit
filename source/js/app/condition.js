@@ -84,8 +84,8 @@ define([
           sgst.push(new SuggestionVM(e));
         }, this);
         this.suggestion(sgst.slice(0, 10));
-        this.lat(sgst[0].lat());
-        this.lon(sgst[0].lon());
+        this.lat(sgst[0].lat);
+        this.lon(sgst[0].lon);
       } else {
 
       }
@@ -109,10 +109,10 @@ define([
     selectLocation: function(v) {
       console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
-      this.address(v.address());
+      this.address(v.address);
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
-      this.lat(v.lat());
-      this.lon(v.lon());
+      this.lat(v.lat);
+      this.lon(v.lon);
       this.suggestion([]);
       $('#start-search').trigger('click');
     },

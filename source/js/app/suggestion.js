@@ -19,16 +19,12 @@ place_id: "ChIJT7K2iBgoil8Rz4HxlRk2pJs"
 types: Array[3]
 */
 
-define([
-  'knockout',
-  'mod/extend'
-], function(ko, extend) {
+define([], function() {
   function SuggestionVM(data) {
-    this.address = ko.observable(data.formatted_address);
-    this.lat = ko.observable(data.geometry.location.lat);
-    this.lon = ko.observable(data.geometry.location.lng);
+    this.address = data.formatted_address;
+    this.lat = data.geometry.location.lat;
+    this.lon = data.geometry.location.lng;
   }
-  extend(SuggestionVM.prototype, {});
-  
+
   return SuggestionVM;
 });

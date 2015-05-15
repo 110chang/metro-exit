@@ -7,12 +7,11 @@
 */
 
 define([
-  'knockout',
   'mod/extend',
   'app/config',
   'app/condition',
   'app/directions'
-], function(ko, extend, CFG, ConditionVM, Directions) {
+], function(extend, CFG, ConditionVM, Directions) {
   var exitIcon = {
     url: '../img/ico_exit.png',
     scaledSize : new google.maps.Size(22, 40),
@@ -141,8 +140,8 @@ define([
 
       // operation each POI
       points.forEach(function(p) {
-        var title = p.title();
-        var coords = latLng(p.lat(), p.lon());
+        var title = p.title;
+        var coords = latLng(p.lat, p.lon);
         var icon = /エレベーター?/.test(title) ? elevIcon : exitIcon;// エレベーター判定
         var content = this.createInfoContent(coords, title);
 

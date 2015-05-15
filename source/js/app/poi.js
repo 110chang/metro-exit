@@ -18,23 +18,19 @@ ug:region: "https://api.tokyometroapp.jp/api/v2/places/urn:ucode:_00001C00000000
 ugsrv:categoryName: "出入口"
 */
 
-define([
-  'knockout',
-  'mod/extend'
-], function(ko, extend) {
+define([], function() {
   function POIVM(data) {
-    this.context = ko.observable(data['@context']);
-    this.id = ko.observable(data['@id']);
-    this.type = ko.observable(data['@type']);
-    this.title = ko.observable(data['dc:title']);
-    this.lat = ko.observable(data['geo:lat']);
-    this.lon = ko.observable(data['geo:long']);
-    this.floor = ko.observable(data['ug:floor']);
-    this.region = ko.observable(data['ug:region']);
-    this.ucode = ko.observable(data['urn:ucode']);
-    this.category = ko.observable(data['ugsrv:categoryName']);
+    this.context = data['@context'];
+    this.id = data['@id'];
+    this.type = data['@type'];
+    this.title = data['dc:title'];
+    this.lat = data['geo:lat'];
+    this.lon = data['geo:long'];
+    this.floor = data['ug:floor'];
+    this.region = data['ug:region'];
+    this.ucode = data['urn:ucode'];
+    this.category = data['ugsrv:categoryName'];
   }
-  extend(POIVM.prototype, {});
-  
+
   return POIVM;
 });

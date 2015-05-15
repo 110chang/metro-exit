@@ -598,17 +598,13 @@ place_id: "ChIJT7K2iBgoil8Rz4HxlRk2pJs"
 types: Array[3]
 */
 
-define('app/suggestion',[
-  'knockout',
-  'mod/extend'
-], function(ko, extend) {
+define('app/suggestion',[], function() {
   function SuggestionVM(data) {
-    this.address = ko.observable(data.formatted_address);
-    this.lat = ko.observable(data.geometry.location.lat);
-    this.lon = ko.observable(data.geometry.location.lng);
+    this.address = data.formatted_address;
+    this.lat = data.geometry.location.lat;
+    this.lon = data.geometry.location.lng;
   }
-  extend(SuggestionVM.prototype, {});
-  
+
   return SuggestionVM;
 });
 
@@ -866,8 +862,8 @@ define('app/condition',[
           sgst.push(new SuggestionVM(e));
         }, this);
         this.suggestion(sgst.slice(0, 10));
-        this.lat(sgst[0].lat());
-        this.lon(sgst[0].lon());
+        this.lat(sgst[0].lat);
+        this.lon(sgst[0].lon);
       } else {
 
       }
@@ -891,10 +887,10 @@ define('app/condition',[
     selectLocation: function(v) {
       console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
-      this.address(v.address());
+      this.address(v.address);
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
-      this.lat(v.lat());
-      this.lon(v.lon());
+      this.lat(v.lat);
+      this.lon(v.lon);
       this.suggestion([]);
       $('#start-search').trigger('click');
     },
@@ -940,24 +936,20 @@ ug:region: "https://api.tokyometroapp.jp/api/v2/places/urn:ucode:_00001C00000000
 ugsrv:categoryName: "出入口"
 */
 
-define('app/poi',[
-  'knockout',
-  'mod/extend'
-], function(ko, extend) {
+define('app/poi',[], function() {
   function POIVM(data) {
-    this.context = ko.observable(data['@context']);
-    this.id = ko.observable(data['@id']);
-    this.type = ko.observable(data['@type']);
-    this.title = ko.observable(data['dc:title']);
-    this.lat = ko.observable(data['geo:lat']);
-    this.lon = ko.observable(data['geo:long']);
-    this.floor = ko.observable(data['ug:floor']);
-    this.region = ko.observable(data['ug:region']);
-    this.ucode = ko.observable(data['urn:ucode']);
-    this.category = ko.observable(data['ugsrv:categoryName']);
+    this.context = data['@context'];
+    this.id = data['@id'];
+    this.type = data['@type'];
+    this.title = data['dc:title'];
+    this.lat = data['geo:lat'];
+    this.lon = data['geo:long'];
+    this.floor = data['ug:floor'];
+    this.region = data['ug:region'];
+    this.ucode = data['urn:ucode'];
+    this.category = data['ugsrv:categoryName'];
   }
-  extend(POIVM.prototype, {});
-  
+
   return POIVM;
 });
 
@@ -1053,11 +1045,10 @@ define('app/distance',[
 */
 
 define('app/directions',[
-  'knockout',
   'mod/extend',
   'app/config',
   'app/distance'
-], function(ko, extend, CFG, DistanceVM) {
+], function(extend, CFG, DistanceVM) {
   var renderOpt = {
     preserveViewport: true,
     suppressMarkers: true,
@@ -1152,12 +1143,11 @@ define('app/directions',[
 */
 
 define('app/map',[
-  'knockout',
   'mod/extend',
   'app/config',
   'app/condition',
   'app/directions'
-], function(ko, extend, CFG, ConditionVM, Directions) {
+], function(extend, CFG, ConditionVM, Directions) {
   var exitIcon = {
     url: '../img/ico_exit.png',
     scaledSize : new google.maps.Size(22, 40),
@@ -1286,8 +1276,8 @@ define('app/map',[
 
       // operation each POI
       points.forEach(function(p) {
-        var title = p.title();
-        var coords = latLng(p.lat(), p.lon());
+        var title = p.title;
+        var coords = latLng(p.lat, p.lon);
         var icon = /エレベーター?/.test(title) ? elevIcon : exitIcon;// エレベーター判定
         var content = this.createInfoContent(coords, title);
 
@@ -1340,6 +1330,9 @@ define('app/poicollection',[
         points.push(poi);
       }, this);
       this.points(points);
+    },
+    size: function() {
+      return this.points().length;
     },
     search: function(params) {
       console.log('POICollectionVM#search');
@@ -1701,7 +1694,8 @@ require([
     $(window).on('onMetroAPISuccess', function(e, data) {
       if (data.results.length > 0) {
         map.update(collectionVM.points());
-        $.notify('出入口情報を取得しました', 'success');
+        var size = collectionVM.size();
+        $.notify(size + '件の出入口情報を取得しました', 'success');
       } else {
         map.update();
         $.notify('出入口情報はありません', 'warn');

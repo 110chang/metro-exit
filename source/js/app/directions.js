@@ -7,11 +7,10 @@
 */
 
 define([
-  'knockout',
   'mod/extend',
   'app/config',
   'app/distance'
-], function(ko, extend, CFG, DistanceVM) {
+], function(extend, CFG, DistanceVM) {
   var renderOpt = {
     preserveViewport: true,
     suppressMarkers: true,
