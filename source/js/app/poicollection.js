@@ -29,6 +29,9 @@ define([
       }, this);
       this.points(points);
     },
+    size: function() {
+      return this.points().length;
+    },
     search: function(params) {
       console.log('POICollectionVM#search');
       //console.log(PROXY_URL + '?url=' + API_BASE + params);

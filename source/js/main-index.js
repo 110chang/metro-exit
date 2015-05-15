@@ -144,7 +144,8 @@ require([
     $(window).on('onMetroAPISuccess', function(e, data) {
       if (data.results.length > 0) {
         map.update(collectionVM.points());
-        $.notify('出入口情報を取得しました', 'success');
+        var size = collectionVM.size();
+        $.notify(size + '件の出入口情報を取得しました', 'success');
       } else {
         map.update();
         $.notify('出入口情報はありません', 'warn');
