@@ -1,0 +1,46 @@
+@charset "utf-8"
+
+@import compass/css3
+@import compass/typography
+@import _config.sass
+@import _util.sass
+
+// ============================
+// 
+//     Notify.js style
+//
+// ============================
+
+.notifyjs-bootstrap-base
+  font-size: 1rem
+  line-height: 140%
+  padding: 0.5em 1rem
+  +use-montserrat()
+  font-weight: bold
+  background: $color-off
+  background: rgba($color-off, 0.9)
+  white-space: nowrap
+
+.notifyjs-bootstrap-error
+  color: #FFF
+  background: $color-warn
+  background: rgba($color-warn, 0.9)
+.notifyjs-bootstrap-success
+  color: #FFF
+  background: $key-color
+  background: rgba($key-color, 0.9)
+.notifyjs-bootstrap-info
+  color: $color-info
+  background: $color-off
+  background: rgba($color-off, 0.9)
+.notifyjs-bootstrap-warn
+  color: #333
+  background: $color-attn
+  background: rgba($color-attn, 0.9)
+
+
+@media screen and (max-width: 479px)
+  .notifyjs-bootstrap-base
+    font-size: 0.75rem
+    line-height: 140%
+    padding: 0.25em 0.5em

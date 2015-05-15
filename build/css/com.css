@@ -331,6 +331,7 @@ button.button-skin[disabled] .button-label {
   left: 0;
   width: 100%;
   padding: 3px;
+  background: #000;
   background: rgba(0, 0, 0, 0.6);
   color: #FFF;
   border-radius: 4px;
@@ -481,6 +482,7 @@ button.button-skin[disabled] .button-label {
   width: 100%;
   margin-bottom: -4em;
   padding: 0.5em 0;
+  background: #000;
   background: rgba(0, 0, 0, 0.8);
   color: #29CA83;
   text-align: center;
@@ -520,6 +522,7 @@ button.button-skin[disabled] .button-label {
 #poi-list.enabled {
   width: 20%;
   height: 100%;
+  background: #FFF;
   background: rgba(255, 255, 255, 0.8);
 }
 #poi-list.enabled ul {
@@ -672,5 +675,47 @@ button.button-skin[disabled] .button-label {
 
   #distance {
     bottom: 80px;
+  }
+}
+.notifyjs-bootstrap-base {
+  font-size: 1rem;
+  line-height: 140%;
+  padding: 0.5em 1rem;
+  font-family: "Montserrat", sans-serif;
+  font-weight: bold;
+  background: #FCF8E3;
+  background: rgba(252, 248, 227, 0.9);
+  white-space: nowrap;
+}
+
+.notifyjs-bootstrap-error {
+  color: #FFF;
+  background: #F65855;
+  background: rgba(246, 88, 85, 0.9);
+}
+
+.notifyjs-bootstrap-success {
+  color: #FFF;
+  background: #29CA83;
+  background: rgba(41, 202, 131, 0.9);
+}
+
+.notifyjs-bootstrap-info {
+  color: #0085C0;
+  background: #FCF8E3;
+  background: rgba(252, 248, 227, 0.9);
+}
+
+.notifyjs-bootstrap-warn {
+  color: #333;
+  background: #FFE970;
+  background: rgba(255, 233, 112, 0.9);
+}
+
+@media screen and (max-width: 479px) {
+  .notifyjs-bootstrap-base {
+    font-size: 0.75rem;
+    line-height: 140%;
+    padding: 0.25em 0.5em;
   }
 }
