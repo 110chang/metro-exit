@@ -1391,6 +1391,7 @@ define('app/geolocation',[
       console.log('Geolocation#getCurrent');
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition($.proxy(this.success, this), $.proxy(this.error, this), {
+          enableHighAccuracy: true,
           timeout: 10000
         });
       } else {
