@@ -44,6 +44,11 @@ html.introduction lang="ja"
     = NEWLINE
     = javascript_include_tag "lib/jquery.easing", type: nil
     = NEWLINE
+    /! Cross-Domain AJAX for IE8 and IE9
+    = NEWLINE
+    /[if lt IE 10]
+      = javascript_include_tag "lib/jquery.xdomainrequest.min", type: nil
+    = NEWLINE
     = javascript_include_tag "lib/notify", type: nil
     = NEWLINE
     = javascript_include_tag "lib/notify-bootstrap", type: nil

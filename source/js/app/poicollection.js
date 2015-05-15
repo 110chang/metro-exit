@@ -45,6 +45,7 @@ define([
     },
     onAPIError: function(results) {
       console.log('POICollectionVM#onAPIError');
+      console.log(results)
       $(window).trigger('onMetroAPIFail');
     }
   });

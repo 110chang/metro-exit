@@ -59,6 +59,7 @@ require([
   $(function() {
     //console.log('DOM ready.');
     initializeNotifyPos();
+    $.support.cors = true;
 
     //
     // initialize ViewModels and Objects
