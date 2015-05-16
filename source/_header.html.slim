@@ -17,7 +17,7 @@ header#masthead
         :'data-bind' => "value: address, valueUpdate: 'keyup'")
         .sgst-list data-bind="visible: suggestion().length > 0"
           ul data-bind="foreach: suggestion"
-            li data-bind="click: $.proxy($root.selectLocation, $root)"
+            li data-bind="css: { on: focused }, click: $.proxy($root.selectLocation, $root)"
               p data-bind="text: address"
 
       / 検索半径

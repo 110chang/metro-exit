@@ -90,6 +90,22 @@ require([
     stashInputValue($('#param-address-input'));
     stashInputValue($('#param-radius-input'));
 
+    $('#param-address-input').on('focus', function(e) {
+      console.log('Main#paramAddressInputFocus');
+      $(this).on('keydown.tabControl', function(e) {
+        if (e.keyCode === 9 && conditionVM.hasSuggestion()) {
+          console.log(e.keyCode);
+          e.preventDefault();
+          conditionVM.focusLocation();
+        }
+      });
+    });
+
+    $('#param-address-input').on('blur', function(e) {
+      console.log('Main#paramAddressInputBlur');
+      $(this).off('keydown.tabControl');
+    });
+
     $('#start-search').on('click', function(e) {
       console.log('%cMain#startSearchClicked', 'background: yellow');
       if (map == null) {
@@ -123,7 +139,11 @@ require([
     $('#masthead').on('keydown', function(e) {
       //console.log(e.keyCode);
       if (e.keyCode === 13) {
-        $('#start-search').trigger('click');
+        if (conditionVM.hasSuggestion() && conditionVM.focusSuggestion > -1) {
+          conditionVM.selectFocusedLocation();
+        } else {
+          $('#start-search').trigger('click');
+        }
       }
     });
 

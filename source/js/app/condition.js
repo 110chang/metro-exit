@@ -44,6 +44,7 @@ define([
     if (!(this instanceof ConditionVM)) {
       return new ConditionVM(data);
     }
+    this.focusSuggestion = -1;
     this.lat = ko.observable(data.lat);
     this.lon = ko.observable(data.lon);
     this.address = ko.observable(data.address);
@@ -106,6 +107,22 @@ define([
 
       }
     },
+    focusLocation: function() {
+      this.focusSuggestion++;
+      if (this.focusSuggestion >= this.suggestion().length) {
+        this.focusSuggestion = -1;
+      }
+      this.suggestion().forEach(function(e) {
+        e.focused(false);
+      });
+      if (this.focusSuggestion > -1) {
+        this.suggestion()[this.focusSuggestion].focused(true);
+      }
+    },
+    selectFocusedLocation: function() {
+      console.log($('.sgst-list li').eq(this.focusSuggestion));
+      console.log(ko.contextFor($('.sgst-list li').get(this.focusSuggestion)));
+    },
     selectLocation: function(v) {
       console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
@@ -114,6 +131,7 @@ define([
       this.lat(v.lat);
       this.lon(v.lon);
       this.suggestion([]);
+      this.focusSuggestion = -1;
       $('#start-search').trigger('click');
     },
     getAPIParams: function() {
@@ -132,6 +150,10 @@ define([
     },
     hideSuggestion: function() {
       this.suggestion([]);
+      this.focusSuggestion = -1;
+    },
+    hasSuggestion: function() {
+      return this.suggestion().length > 0;
     }
   });
   
