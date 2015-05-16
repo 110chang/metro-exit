@@ -712,7 +712,7 @@ button.button-skin[disabled] .button-label {
   background: rgba(255, 233, 112, 0.9);
 }
 
-@media screen and (max-width: 479px) {
+@media screen and (max-width: 767px) {
   .notifyjs-bootstrap-base {
     font-size: 0.75rem;
     line-height: 140%;
