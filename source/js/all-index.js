@@ -579,6 +579,85 @@ define('mod/extend',[], function() {
 
 /*
 *
+*   SuggestCollectionVM
+*
+*   @author Yuji Ito @110chang
+*
+*/
+
+define('app/suggestcollection',[
+  'knockout',
+  'mod/extend'
+], function(ko, extend) {
+  function SuggestCollectionVM(data) {
+    this.selected = -1;
+    this.suggestions = ko.observableArray([]);
+  }
+  extend(SuggestCollectionVM.prototype, {
+    add: function(suggest) {
+      if (suggest.length && suggest.length > 0) {
+        this.suggestions(this.suggestions().concat(suggest));
+      } else {
+        this.suggestions.push(suggest);
+      }
+    },
+    get: function() {
+      return this.suggestions();
+    },
+    set: function(suggestions) {
+      this.suggestions(suggestions);
+    },
+    clear: function() {
+      this.suggestions([]);
+      this.selected = -1;
+    },
+    current: function() {
+      return this.get()[this.selected];
+    },
+    updateFocus: function() {
+      this.clearFocus();
+      if (this.hasFocused()) {
+        this.get()[this.selected].focused(true);
+      }
+    },
+    toggle: function() {
+      this.next();
+    },
+    prev: function() {
+      this.selected--;
+      if (this.selected < -1) {
+        this.selected = this.get().length - 1;
+      }
+      this.updateFocus();
+    },
+    next: function() {
+      this.selected++;
+      if (this.selected >= this.get().length) {
+        this.selected = -1;
+      }
+      this.updateFocus();
+    },
+    clearFocus: function() {
+      this.get().forEach(function(suggest) {
+        suggest.focused(false);
+      });
+    },
+    hasSuggestion: function() {
+      return this.get().length > 0;
+    },
+    hasFocused: function() {
+      return this.selected > -1;
+    },
+    isSelected: function() {
+      return this.hasSuggestion() && this.hasFocused();
+    }
+  });
+
+  return SuggestCollectionVM;
+});
+
+/*
+*
 *   SuggestionVM
 *
 *   @author Yuji Ito @110chang
@@ -598,11 +677,14 @@ place_id: "ChIJT7K2iBgoil8Rz4HxlRk2pJs"
 types: Array[3]
 */
 
-define('app/suggestion',[], function() {
+define('app/suggestion',[
+  'knockout'
+], function(ko) {
   function SuggestionVM(data) {
     this.address = data.formatted_address;
     this.lat = data.geometry.location.lat;
     this.lon = data.geometry.location.lng;
+    this.focused = ko.observable(false);
   }
 
   return SuggestionVM;
@@ -789,11 +871,12 @@ define('mod/fallbacks/object/keys',[], function() {
 define('app/condition',[
   'knockout',
   'mod/extend',
+  'app/suggestcollection',
   'app/suggestion',
   'mod/fallbacks/array/foreach',
   'mod/fallbacks/array/indexof',
   'mod/fallbacks/object/keys'
-], function(ko, extend, SuggestionVM) {
+], function(ko, extend, SuggestCollectionVM, SuggestionVM) {
   var _instance = null;
   var componentObj = {
     'country': 'JP'//,
@@ -826,7 +909,7 @@ define('app/condition',[
     this.lon = ko.observable(data.lon);
     this.address = ko.observable(data.address);
     this.radius = ko.observable(data.radius);
-    this.suggestion = ko.observableArray([]);
+    this.suggestions = new SuggestCollectionVM();
     this.isSearchByParams = ko.observable(false);
     this.isSearchByGeo = ko.observable(false);
 
@@ -835,12 +918,9 @@ define('app/condition',[
     _instance = this;
   }
   extend(ConditionVM.prototype, {
-    startSearch: function() {
-      console.log('ConditionVM#startSearch');
-    },
-    clearStats: function() {
-      this.isSearchByParams(false);
-      this.isSearchByGeo(false);
+    getAPIParams: function() {
+      console.log('ConditionVM#getAPIParams');
+      return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
     },
     setLatLng: function(lat, lon) {
       console.log('ConditionVM#setLatLng');
@@ -861,7 +941,7 @@ define('app/condition',[
         data.results.forEach(function(e) {
           sgst.push(new SuggestionVM(e));
         }, this);
-        this.suggestion(sgst.slice(0, 10));
+        this.suggestions.set(sgst.slice(0, 10));
         this.lat(sgst[0].lat);
         this.lon(sgst[0].lon);
       } else {
@@ -891,11 +971,23 @@ define('app/condition',[
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
       this.lat(v.lat);
       this.lon(v.lon);
-      this.suggestion([]);
+      this.suggestions.clear();
+      this.focusSuggestion = -1;
       $('#start-search').trigger('click');
     },
-    getAPIParams: function() {
-      return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
+    clearStats: function() {
+      this.isSearchByParams(false);
+      this.isSearchByGeo(false);
+    },
+    hideSuggestion: function() {
+      console.log('ConditionVM#hideSuggestion');
+      this.suggestions.clear();
+    },
+    toggleFocus: function() {
+      console.log('ConditionVM#toggleFocus');
+      if (this.suggestions.hasSuggestion()) {
+        this.suggestions.toggle();
+      }
     },
     toggleRange: function() {
       console.log('ConditionVM#toggleRange');
@@ -908,8 +1000,20 @@ define('app/condition',[
       }
       this.radius(tmp);
     },
-    hideSuggestion: function() {
-      this.suggestion([]);
+    onEnterKeydown: function() {
+      console.log('ConditionVM#onEnterKeydown');
+      if (this.suggestions.isSelected()) {
+        this.selectLocation(this.suggestions.current());
+      } else {
+        $('#start-search').trigger('click');
+      }
+    },
+    onArrowKeyDown: function(keyCode) {
+      if (keyCode === 37 || keyCode === 38) {
+        this.suggestions.prev();
+      } else if (keyCode === 39 || keyCode === 40) {
+        this.suggestions.next();
+      }
     }
   });
   
@@ -1642,6 +1746,25 @@ require([
     stashInputValue($('#param-address-input'));
     stashInputValue($('#param-radius-input'));
 
+    $('#param-address-input').on('focus', function(e) {
+      console.log('Main#paramAddressInputFocus');
+      $(this).on('keydown.tabControl', function(e) {
+        console.log(e.keyCode);
+        if (e.keyCode === 9) {
+          e.preventDefault();
+          conditionVM.toggleFocus();
+        } else if (37 <= e.keyCode && e.keyCode <= 40) {
+          e.preventDefault();
+          conditionVM.onArrowKeyDown(e.keyCode);
+        }
+      });
+    });
+
+    $('#param-address-input').on('blur', function(e) {
+      console.log('Main#paramAddressInputBlur');
+      $(this).off('keydown.tabControl');
+    });
+
     $('#start-search').on('click', function(e) {
       console.log('%cMain#startSearchClicked', 'background: yellow');
       if (map == null) {
@@ -1675,7 +1798,7 @@ require([
     $('#masthead').on('keydown', function(e) {
       //console.log(e.keyCode);
       if (e.keyCode === 13) {
-        $('#start-search').trigger('click');
+        conditionVM.onEnterKeydown();
       }
     });
 

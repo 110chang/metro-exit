@@ -11,11 +11,12 @@
 define([
   'knockout',
   'mod/extend',
+  'app/suggestcollection',
   'app/suggestion',
   'mod/fallbacks/array/foreach',
   'mod/fallbacks/array/indexof',
   'mod/fallbacks/object/keys'
-], function(ko, extend, SuggestionVM) {
+], function(ko, extend, SuggestCollectionVM, SuggestionVM) {
   var _instance = null;
   var componentObj = {
     'country': 'JP'//,
@@ -44,12 +45,11 @@ define([
     if (!(this instanceof ConditionVM)) {
       return new ConditionVM(data);
     }
-    this.focusSuggestion = -1;
     this.lat = ko.observable(data.lat);
     this.lon = ko.observable(data.lon);
     this.address = ko.observable(data.address);
     this.radius = ko.observable(data.radius);
-    this.suggestion = ko.observableArray([]);
+    this.suggestions = new SuggestCollectionVM();
     this.isSearchByParams = ko.observable(false);
     this.isSearchByGeo = ko.observable(false);
 
@@ -58,12 +58,9 @@ define([
     _instance = this;
   }
   extend(ConditionVM.prototype, {
-    startSearch: function() {
-      console.log('ConditionVM#startSearch');
-    },
-    clearStats: function() {
-      this.isSearchByParams(false);
-      this.isSearchByGeo(false);
+    getAPIParams: function() {
+      console.log('ConditionVM#getAPIParams');
+      return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
     },
     setLatLng: function(lat, lon) {
       console.log('ConditionVM#setLatLng');
@@ -84,7 +81,7 @@ define([
         data.results.forEach(function(e) {
           sgst.push(new SuggestionVM(e));
         }, this);
-        this.suggestion(sgst.slice(0, 10));
+        this.suggestions.set(sgst.slice(0, 10));
         this.lat(sgst[0].lat);
         this.lon(sgst[0].lon);
       } else {
@@ -107,22 +104,6 @@ define([
 
       }
     },
-    focusLocation: function() {
-      this.focusSuggestion++;
-      if (this.focusSuggestion >= this.suggestion().length) {
-        this.focusSuggestion = -1;
-      }
-      this.suggestion().forEach(function(e) {
-        e.focused(false);
-      });
-      if (this.focusSuggestion > -1) {
-        this.suggestion()[this.focusSuggestion].focused(true);
-      }
-    },
-    selectFocusedLocation: function() {
-      console.log($('.sgst-list li').eq(this.focusSuggestion));
-      console.log(ko.contextFor($('.sgst-list li').get(this.focusSuggestion)));
-    },
     selectLocation: function(v) {
       console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
@@ -130,12 +111,23 @@ define([
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
       this.lat(v.lat);
       this.lon(v.lon);
-      this.suggestion([]);
+      this.suggestions.clear();
       this.focusSuggestion = -1;
       $('#start-search').trigger('click');
     },
-    getAPIParams: function() {
-      return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
+    clearStats: function() {
+      this.isSearchByParams(false);
+      this.isSearchByGeo(false);
+    },
+    hideSuggestion: function() {
+      console.log('ConditionVM#hideSuggestion');
+      this.suggestions.clear();
+    },
+    toggleFocus: function() {
+      console.log('ConditionVM#toggleFocus');
+      if (this.suggestions.hasSuggestion()) {
+        this.suggestions.toggle();
+      }
     },
     toggleRange: function() {
       console.log('ConditionVM#toggleRange');
@@ -148,12 +140,20 @@ define([
       }
       this.radius(tmp);
     },
-    hideSuggestion: function() {
-      this.suggestion([]);
-      this.focusSuggestion = -1;
+    onEnterKeydown: function() {
+      console.log('ConditionVM#onEnterKeydown');
+      if (this.suggestions.isSelected()) {
+        this.selectLocation(this.suggestions.current());
+      } else {
+        $('#start-search').trigger('click');
+      }
     },
-    hasSuggestion: function() {
-      return this.suggestion().length > 0;
+    onArrowKeyDown: function(keyCode) {
+      if (keyCode === 37 || keyCode === 38) {
+        this.suggestions.prev();
+      } else if (keyCode === 39 || keyCode === 40) {
+        this.suggestions.next();
+      }
     }
   });
   

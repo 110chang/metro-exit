@@ -3,7 +3,7 @@ module.exports = function(grunt) {
   var requirejsOptions = {};
 
   // create requirejs options
-  ['main'].forEach(function(main, i) {
+  ['main', 'main-index'].forEach(function(main, i) {
     var name = 'compile' + i;
     var all = main.replace(/^main/, "all");
     requirejsOptions[name] = {

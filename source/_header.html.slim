@@ -15,8 +15,8 @@ header#masthead
       span.param-address
         = slls text_field_tag("address", id: "param-address-input", \
         :'data-bind' => "value: address, valueUpdate: 'keyup'")
-        .sgst-list data-bind="visible: suggestion().length > 0"
-          ul data-bind="foreach: suggestion"
+        .sgst-list data-bind="visible: suggestions.hasSuggestion()"
+          ul data-bind="foreach: suggestions.get()"
             li data-bind="css: { on: focused }, click: $.proxy($root.selectLocation, $root)"
               p data-bind="text: address"
 

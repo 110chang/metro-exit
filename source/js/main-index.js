@@ -93,10 +93,13 @@ require([
     $('#param-address-input').on('focus', function(e) {
       console.log('Main#paramAddressInputFocus');
       $(this).on('keydown.tabControl', function(e) {
-        if (e.keyCode === 9 && conditionVM.hasSuggestion()) {
-          console.log(e.keyCode);
+        console.log(e.keyCode);
+        if (e.keyCode === 9) {
           e.preventDefault();
-          conditionVM.focusLocation();
+          conditionVM.toggleFocus();
+        } else if (37 <= e.keyCode && e.keyCode <= 40) {
+          e.preventDefault();
+          conditionVM.onArrowKeyDown(e.keyCode);
         }
       });
     });
@@ -139,11 +142,7 @@ require([
     $('#masthead').on('keydown', function(e) {
       //console.log(e.keyCode);
       if (e.keyCode === 13) {
-        if (conditionVM.hasSuggestion() && conditionVM.focusSuggestion > -1) {
-          conditionVM.selectFocusedLocation();
-        } else {
-          $('#start-search').trigger('click');
-        }
+        conditionVM.onEnterKeydown();
       }
     });
 

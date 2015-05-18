@@ -38,9 +38,9 @@
             </h1>
           </div>
           <span class="param-address"><input id="param-address-input" data-bind="value: address, valueUpdate: 'keyup'" name="address" type="text">
-            <div class="sgst-list" data-bind="visible: suggestion().length > 0">
-              <ul data-bind="foreach: suggestion">
-                <li data-bind="click: $.proxy($root.selectLocation, $root)">
+            <div class="sgst-list" data-bind="visible: suggestions.hasSuggestion()">
+              <ul data-bind="foreach: suggestions.get()">
+                <li data-bind="css: { on: focused }, click: $.proxy($root.selectLocation, $root)">
                   <p data-bind="text: address"></p>
                 </li>
               </ul>
