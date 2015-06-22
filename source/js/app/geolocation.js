@@ -32,7 +32,7 @@ define([
   }
   extend(Geolocation.prototype, {
     getCurrent: function() {
-      console.log('Geolocation#getCurrent');
+      //console.log('Geolocation#getCurrent');
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition($.proxy(this.success, this), $.proxy(this.error, this), {
           enableHighAccuracy: true,
@@ -43,14 +43,14 @@ define([
       }
     },
     success: function(pos) {
-      console.log('Geolocation#success');
+      //console.log('Geolocation#success');
       this.lat = pos.coords.latitude;//35.684378;//test code
       this.lon = pos.coords.longitude;//139.738338;//test code
       $(window).trigger('onGeolocationSuccess');
     },
     error: function(error) {
-      console.log('Geolocation#error');
-      console.log(error.code);
+      //console.log('Geolocation#error');
+      //console.log(error.code);
       $(window).trigger('onGeolocationFail');
     }
   });

@@ -71,12 +71,12 @@ define([
   }
   extend(Map.prototype, {
     onCenterChanged: function() {
-      console.log('Map#onCenterChanged');
-      console.log('center changed');
+      ///console.log('Map#onCenterChanged');
+      //console.log('center changed');
       //this.clearRoute();
     },
     clearRoute: function() {
-      console.log('Map#clearRoute');
+      //console.log('Map#clearRoute');
       this.directions.clear();
     },
     createMarker: function(latLng, title, content, icon) {
@@ -120,11 +120,11 @@ define([
       return content;
     },
     findRoute: function(to) {
-      console.log('Map#findRoute');
+      //console.log('Map#findRoute');
       this.directions.update(this.center, to);
     },
     update: function(points) {
-      console.log('Map#update');
+      //console.log('Map#update');
       points = points || [];
       this.clearRoute();
       // remove existing markers

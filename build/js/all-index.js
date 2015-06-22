@@ -919,22 +919,22 @@ define('app/condition',[
   }
   extend(ConditionVM.prototype, {
     getAPIParams: function() {
-      console.log('ConditionVM#getAPIParams');
+      //console.log('ConditionVM#getAPIParams');
       return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
     },
     setLatLng: function(lat, lon) {
-      console.log('ConditionVM#setLatLng');
+      //console.log('ConditionVM#setLatLng');
       this.lat(lat);
       this.lon(lon);
       this.getAddress();
     },
     getLatLng: function() {
-      console.log('ConditionVM#getLatLng');
+      //console.log('ConditionVM#getLatLng');
       var params = GEOC_PREFIX_ADDRESS + encodeURIComponent(this.address());
       $.getJSON(GEOC_API_BASE + params + GEOC_FILTER + GEOC_POSTFIX, $.proxy(this.onGeocodingSuccess, this));
     },
     onGeocodingSuccess: function(data, status, xhr) {
-      console.log('ConditionVM#onGeocodingSuccess');
+      //console.log('ConditionVM#onGeocodingSuccess');
       if (data.status === 'OK') {
         //console.log(data.results);
         var sgst = [];
@@ -949,14 +949,14 @@ define('app/condition',[
       }
     },
     getAddress: function(lat, lon) {
-      console.log('ConditionVM#getAddress');
+      //console.log('ConditionVM#getAddress');
       this.lat(lat);
       this.lon(lon);
       var params = GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon();
       $.getJSON(GEOC_API_BASE + params + GEOC_POSTFIX, $.proxy(this.onReverseGeocodingSuccess, this));
     },
     onReverseGeocodingSuccess: function(data, status, xhr) {
-      console.log('ConditionVM#onReverseGeocodingSuccess');
+      //console.log('ConditionVM#onReverseGeocodingSuccess');
       if (data.status === 'OK') {
         //console.log(data.results);
         this.selectLocation(new SuggestionVM(data.results[0]));
@@ -965,7 +965,7 @@ define('app/condition',[
       }
     },
     selectLocation: function(v) {
-      console.log('ConditionVM#selectLocation');
+      //console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
       this.address(v.address);
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
@@ -980,17 +980,17 @@ define('app/condition',[
       this.isSearchByGeo(false);
     },
     hideSuggestion: function() {
-      console.log('ConditionVM#hideSuggestion');
+      //console.log('ConditionVM#hideSuggestion');
       this.suggestions.clear();
     },
     toggleFocus: function() {
-      console.log('ConditionVM#toggleFocus');
+      //console.log('ConditionVM#toggleFocus');
       if (this.suggestions.hasSuggestion()) {
         this.suggestions.toggle();
       }
     },
     toggleRange: function() {
-      console.log('ConditionVM#toggleRange');
+      //console.log('ConditionVM#toggleRange');
       var tmp = this.radius();
       var idx = targetRanges.indexOf(tmp);
       if (targetRanges[idx + 1]) {
@@ -1001,7 +1001,7 @@ define('app/condition',[
       this.radius(tmp);
     },
     onEnterKeydown: function() {
-      console.log('ConditionVM#onEnterKeydown');
+      //console.log('ConditionVM#onEnterKeydown');
       if (this.suggestions.isSelected()) {
         this.selectLocation(this.suggestions.current());
       } else {
@@ -1068,13 +1068,13 @@ define('app/poi',[], function() {
 define('app/config',[], function() {
   return {
     color: {
-      key: '#29CA83',//42,202,131
-      dark: '#1F9862',//31,152,98
-      light: '#7EE0B4',//126,224,180
-      pale: '#A9EACD',//169,234,205
-      warn: '#F65855',
-      attn: '#FFE970',
-      info: '#0085C0'
+      key   : '#29CA83',//42,202,131
+      dark  : '#1F9862',//31,152,98
+      light : '#7EE0B4',//126,224,180
+      pale  : '#A9EACD',//169,234,205
+      warn  : '#F65855',
+      attn  : '#FFE970',
+      info  : '#0085C0'
     }
   };
 });
@@ -1175,7 +1175,7 @@ define('app/directions',[
   }
   extend(Directions.prototype, {
     update: function(from, to) {
-      console.log('Directions#update');
+      //console.log('Directions#update');
       this.from = from;
       this.to = to;
       var opt = {
@@ -1192,7 +1192,7 @@ define('app/directions',[
       this.service.route(opt, $.proxy(this.onRouteSuccess, this));
     },
     onRouteSuccess: function(result, status) {
-      console.log('Directions#success');
+      //console.log('Directions#success');
       if (status == google.maps.DirectionsStatus.OK) {
         this.display.setDirections(result);
         var pos = this.fromLatLngToPixel(this.to);
@@ -1207,7 +1207,7 @@ define('app/directions',[
       }
     },
     clear: function() {
-      console.log('Directions#clear');
+      //console.log('Directions#clear');
       if (this.display != null) {
         this.display.setMap(null);
         this.display = null;
@@ -1311,12 +1311,12 @@ define('app/map',[
   }
   extend(Map.prototype, {
     onCenterChanged: function() {
-      console.log('Map#onCenterChanged');
-      console.log('center changed');
+      ///console.log('Map#onCenterChanged');
+      //console.log('center changed');
       //this.clearRoute();
     },
     clearRoute: function() {
-      console.log('Map#clearRoute');
+      //console.log('Map#clearRoute');
       this.directions.clear();
     },
     createMarker: function(latLng, title, content, icon) {
@@ -1360,11 +1360,11 @@ define('app/map',[
       return content;
     },
     findRoute: function(to) {
-      console.log('Map#findRoute');
+      //console.log('Map#findRoute');
       this.directions.update(this.center, to);
     },
     update: function(points) {
-      console.log('Map#update');
+      //console.log('Map#update');
       points = points || [];
       this.clearRoute();
       // remove existing markers
@@ -1433,7 +1433,7 @@ define('app/poicollection',[
   }
   extend(POICollectionVM.prototype, {
     update: function(data) {
-      console.log('POICollectionVM#update');
+      //console.log('POICollectionVM#update');
       var points = [];
       ko.utils.arrayForEach(data, function(e) {
         var poi = new POIVM(e);
@@ -1445,19 +1445,19 @@ define('app/poicollection',[
       return this.points().length;
     },
     search: function(params) {
-      console.log('POICollectionVM#search');
+      //console.log('POICollectionVM#search');
       //console.log(PROXY_URL + '?url=' + API_BASE + params);
       var url = PROXY_URL + '?url=' + API_BASE + params;
       $.getJSON(url, $.proxy(this.onAPISuccess, this)).fail($.proxy(this.onAPIError, this));
     },
     onAPISuccess: function(results) {
-      console.log('POICollectionVM#onAPISuccess');
+      //console.log('POICollectionVM#onAPISuccess');
       this.update(results);
       $(window).trigger('onMetroAPISuccess', { results: results });
     },
     onAPIError: function(results) {
-      console.log('POICollectionVM#onAPIError');
-      console.log(results)
+      //console.log('POICollectionVM#onAPIError');
+      //console.log(results)
       $(window).trigger('onMetroAPIFail');
     }
   });
@@ -1499,7 +1499,7 @@ define('app/geolocation',[
   }
   extend(Geolocation.prototype, {
     getCurrent: function() {
-      console.log('Geolocation#getCurrent');
+      //console.log('Geolocation#getCurrent');
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition($.proxy(this.success, this), $.proxy(this.error, this), {
           enableHighAccuracy: true,
@@ -1510,14 +1510,14 @@ define('app/geolocation',[
       }
     },
     success: function(pos) {
-      console.log('Geolocation#success');
+      //console.log('Geolocation#success');
       this.lat = pos.coords.latitude;//35.684378;//test code
       this.lon = pos.coords.longitude;//139.738338;//test code
       $(window).trigger('onGeolocationSuccess');
     },
     error: function(error) {
-      console.log('Geolocation#error');
-      console.log(error.code);
+      //console.log('Geolocation#error');
+      //console.log(error.code);
       $(window).trigger('onGeolocationFail');
     }
   });
@@ -1753,9 +1753,9 @@ require([
     stashInputValue($('#param-radius-input'));
 
     $('#param-address-input').on('focus', function(e) {
-      console.log('Main#paramAddressInputFocus');
+      //console.log('Main#paramAddressInputFocus');
       $(this).on('keydown.tabControl', function(e) {
-        console.log(e.keyCode);
+        //console.log(e.keyCode);
         if (e.keyCode === 9) {
           e.preventDefault();
           conditionVM.toggleFocus();
@@ -1767,12 +1767,12 @@ require([
     });
 
     $('#param-address-input').on('blur', function(e) {
-      console.log('Main#paramAddressInputBlur');
+      //console.log('Main#paramAddressInputBlur');
       $(this).off('keydown.tabControl');
     });
 
     $('#start-search').on('click', function(e) {
-      console.log('%cMain#startSearchClicked', 'background: yellow');
+      //console.log('%cMain#startSearchClicked', 'background: yellow');
       if (map == null) {
         map = new Map('#gmap');
       }
@@ -1787,7 +1787,7 @@ require([
     });
 
     $('#current-location').on('click', function(e) {
-      console.log('%cMain#currentLocaitonClicked', 'background: yellow');
+      //console.log('%cMain#currentLocaitonClicked', 'background: yellow');
       geolocation.getCurrent();
       conditionVM.isSearchByGeo(true);
       $.notify('現在地を確認しています', 'info');

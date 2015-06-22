@@ -21,7 +21,7 @@ define([
   }
   extend(POICollectionVM.prototype, {
     update: function(data) {
-      console.log('POICollectionVM#update');
+      //console.log('POICollectionVM#update');
       var points = [];
       ko.utils.arrayForEach(data, function(e) {
         var poi = new POIVM(e);
@@ -33,19 +33,19 @@ define([
       return this.points().length;
     },
     search: function(params) {
-      console.log('POICollectionVM#search');
+      //console.log('POICollectionVM#search');
       //console.log(PROXY_URL + '?url=' + API_BASE + params);
       var url = PROXY_URL + '?url=' + API_BASE + params;
       $.getJSON(url, $.proxy(this.onAPISuccess, this)).fail($.proxy(this.onAPIError, this));
     },
     onAPISuccess: function(results) {
-      console.log('POICollectionVM#onAPISuccess');
+      //console.log('POICollectionVM#onAPISuccess');
       this.update(results);
       $(window).trigger('onMetroAPISuccess', { results: results });
     },
     onAPIError: function(results) {
-      console.log('POICollectionVM#onAPIError');
-      console.log(results)
+      //console.log('POICollectionVM#onAPIError');
+      //console.log(results)
       $(window).trigger('onMetroAPIFail');
     }
   });

@@ -59,22 +59,22 @@ define([
   }
   extend(ConditionVM.prototype, {
     getAPIParams: function() {
-      console.log('ConditionVM#getAPIParams');
+      //console.log('ConditionVM#getAPIParams');
       return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
     },
     setLatLng: function(lat, lon) {
-      console.log('ConditionVM#setLatLng');
+      //console.log('ConditionVM#setLatLng');
       this.lat(lat);
       this.lon(lon);
       this.getAddress();
     },
     getLatLng: function() {
-      console.log('ConditionVM#getLatLng');
+      //console.log('ConditionVM#getLatLng');
       var params = GEOC_PREFIX_ADDRESS + encodeURIComponent(this.address());
       $.getJSON(GEOC_API_BASE + params + GEOC_FILTER + GEOC_POSTFIX, $.proxy(this.onGeocodingSuccess, this));
     },
     onGeocodingSuccess: function(data, status, xhr) {
-      console.log('ConditionVM#onGeocodingSuccess');
+      //console.log('ConditionVM#onGeocodingSuccess');
       if (data.status === 'OK') {
         //console.log(data.results);
         var sgst = [];
@@ -89,14 +89,14 @@ define([
       }
     },
     getAddress: function(lat, lon) {
-      console.log('ConditionVM#getAddress');
+      //console.log('ConditionVM#getAddress');
       this.lat(lat);
       this.lon(lon);
       var params = GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon();
       $.getJSON(GEOC_API_BASE + params + GEOC_POSTFIX, $.proxy(this.onReverseGeocodingSuccess, this));
     },
     onReverseGeocodingSuccess: function(data, status, xhr) {
-      console.log('ConditionVM#onReverseGeocodingSuccess');
+      //console.log('ConditionVM#onReverseGeocodingSuccess');
       if (data.status === 'OK') {
         //console.log(data.results);
         this.selectLocation(new SuggestionVM(data.results[0]));
@@ -105,7 +105,7 @@ define([
       }
     },
     selectLocation: function(v) {
-      console.log('ConditionVM#selectLocation');
+      //console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
       this.address(v.address);
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
@@ -120,17 +120,17 @@ define([
       this.isSearchByGeo(false);
     },
     hideSuggestion: function() {
-      console.log('ConditionVM#hideSuggestion');
+      //console.log('ConditionVM#hideSuggestion');
       this.suggestions.clear();
     },
     toggleFocus: function() {
-      console.log('ConditionVM#toggleFocus');
+      //console.log('ConditionVM#toggleFocus');
       if (this.suggestions.hasSuggestion()) {
         this.suggestions.toggle();
       }
     },
     toggleRange: function() {
-      console.log('ConditionVM#toggleRange');
+      //console.log('ConditionVM#toggleRange');
       var tmp = this.radius();
       var idx = targetRanges.indexOf(tmp);
       if (targetRanges[idx + 1]) {
@@ -141,7 +141,7 @@ define([
       this.radius(tmp);
     },
     onEnterKeydown: function() {
-      console.log('ConditionVM#onEnterKeydown');
+      //console.log('ConditionVM#onEnterKeydown');
       if (this.suggestions.isSelected()) {
         this.selectLocation(this.suggestions.current());
       } else {
