@@ -33,7 +33,7 @@ define([
   }
   extend(Directions.prototype, {
     update: function(from, to) {
-      console.log('Directions#update');
+      //console.log('Directions#update');
       this.from = from;
       this.to = to;
       var opt = {
@@ -50,7 +50,7 @@ define([
       this.service.route(opt, $.proxy(this.onRouteSuccess, this));
     },
     onRouteSuccess: function(result, status) {
-      console.log('Directions#success');
+      //console.log('Directions#success');
       if (status == google.maps.DirectionsStatus.OK) {
         this.display.setDirections(result);
         var pos = this.fromLatLngToPixel(this.to);
@@ -65,7 +65,7 @@ define([
       }
     },
     clear: function() {
-      console.log('Directions#clear');
+      //console.log('Directions#clear');
       if (this.display != null) {
         this.display.setMap(null);
         this.display = null;

@@ -91,9 +91,9 @@ require([
     stashInputValue($('#param-radius-input'));
 
     $('#param-address-input').on('focus', function(e) {
-      console.log('Main#paramAddressInputFocus');
+      //console.log('Main#paramAddressInputFocus');
       $(this).on('keydown.tabControl', function(e) {
-        console.log(e.keyCode);
+        //console.log(e.keyCode);
         if (e.keyCode === 9) {
           e.preventDefault();
           conditionVM.toggleFocus();
@@ -105,12 +105,12 @@ require([
     });
 
     $('#param-address-input').on('blur', function(e) {
-      console.log('Main#paramAddressInputBlur');
+      //console.log('Main#paramAddressInputBlur');
       $(this).off('keydown.tabControl');
     });
 
     $('#start-search').on('click', function(e) {
-      console.log('%cMain#startSearchClicked', 'background: yellow');
+      //console.log('%cMain#startSearchClicked', 'background: yellow');
       if (map == null) {
         map = new Map('#gmap');
       }
@@ -125,7 +125,7 @@ require([
     });
 
     $('#current-location').on('click', function(e) {
-      console.log('%cMain#currentLocaitonClicked', 'background: yellow');
+      //console.log('%cMain#currentLocaitonClicked', 'background: yellow');
       geolocation.getCurrent();
       conditionVM.isSearchByGeo(true);
       $.notify('現在地を確認しています', 'info');

@@ -10,20 +10,10 @@ define([
   'mod/extend',
   'app/config',
   'app/condition',
+  'app/markerfactory',
   'app/directions'
-], function(extend, CFG, ConditionVM, Directions) {
-  var exitIcon = {
-    url: '../img/ico_exit.png',
-    scaledSize : new google.maps.Size(22, 40),
-    origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(11, 40)
-  };
-  var elevIcon = {
-    url: '../img/ico_elev.png',
-    scaledSize : new google.maps.Size(22, 40),
-    origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(11, 40)
-  };
+], function(extend, CFG, ConditionVM, MarkerFactory, Directions) {
+  var markerFactory;
 
   function latLng(lat, lng) {
     return new google.maps.LatLng(lat, lng);
@@ -46,7 +36,7 @@ define([
         position: google.maps.ControlPosition.LEFT_CENTER
       },
       // https://snazzymaps.com/style/39/paper
-      styles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"simplified"},{"hue":"#0066ff"},{"saturation":74},{"lightness":100}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"off"},{"weight":0.6},{"saturation":-85},{"lightness":61}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"visibility":"on"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road.local","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"simplified"},{"color":"#5f94ff"},{"lightness":26},{"gamma":5.86}]}]
+      //styles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"simplified"},{"hue":"#0066ff"},{"saturation":74},{"lightness":100}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"off"},{"weight":0.6},{"saturation":-85},{"lightness":61}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"visibility":"on"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road.local","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"simplified"},{"color":"#5f94ff"},{"lightness":26},{"gamma":5.86}]}]
     });
 
     // show subway lines
@@ -67,51 +57,29 @@ define([
     // initialize direction service
     this.directions = new Directions(this.map);
 
+    markerFactory = new MarkerFactory(this.map);
+    markerFactory.subscribe('markerClick', $.proxy(this.onMarkerClick, this));
+
+    //google.maps.event.addListener(this.map, 'click', $.proxy(this.onClick, this));
     google.maps.event.addListener(this.map, 'center_changed', $.proxy(this.onCenterChanged, this));
   }
   extend(Map.prototype, {
     onCenterChanged: function() {
-      console.log('Map#onCenterChanged');
-      console.log('center changed');
+      //console.log('Map#onCenterChanged');
+      //console.log('center changed');
       //this.clearRoute();
     },
-    clearRoute: function() {
-      console.log('Map#clearRoute');
-      this.directions.clear();
+    onClick: function(e) {
+      //console.log('Map#onClick');
+      //console.log(e.latLng);
     },
-    createMarker: function(latLng, title, content, icon) {
-      //console.log('Map#createMarker');
-      // create marker option
-      var opt = {
-        position: latLng,
-        map: this.map,
-        title: title
-      };
-      if (icon) {
-        opt.icon = icon;
-      }
-
-      // create marker
-      var marker = new google.maps.Marker(opt);
-      var _self = this;
-
-      // create infowindow if specified content
-      if (content) {
-        var infoWindow = new google.maps.InfoWindow({
-          content: content
-        });
-        google.maps.event.addListener(marker, 'mouseover', function() {
-          infoWindow.open(this.map, marker);
-        });
-        google.maps.event.addListener(marker, 'mouseout', function() {
-          infoWindow.close(this.map, marker);
-        });
-        google.maps.event.addListener(marker, 'click', function() {
-          infoWindow.open(this.map, marker);
-          _self.findRoute(this.getPosition());
-        });
-      }
-      return marker;
+    onMarkerClick: function(e, data) {
+      //console.log('Map#onMarkerClick');
+      this.findRoute(data);
+    },
+    clearRoute: function() {
+      //console.log('Map#clearRoute');
+      this.directions.clear();
     },
     createInfoContent: function(latLng, title) {
       //console.log('Map#createInfoContent');
@@ -120,11 +88,11 @@ define([
       return content;
     },
     findRoute: function(to) {
-      console.log('Map#findRoute');
+      //console.log('Map#findRoute');
       this.directions.update(this.center, to);
     },
     update: function(points) {
-      console.log('Map#update');
+      //console.log('Map#update');
       points = points || [];
       this.clearRoute();
       // remove existing markers
@@ -138,7 +106,7 @@ define([
       this.map.panTo(this.center);
       
       // create center marker
-      this.markers.push(this.createMarker(this.center, ConditionVM().address(), ConditionVM().address()));
+      this.markers.push(markerFactory.create('center', this.center, ConditionVM().address(), ConditionVM().address()));
 
       // initialize bounds
       var bounds = new google.maps.LatLngBounds();
@@ -148,10 +116,10 @@ define([
       points.forEach(function(p) {
         var title = p.title;
         var coords = latLng(p.lat, p.lon);
-        var icon = /エレベーター?/.test(title) ? elevIcon : exitIcon;// エレベーター判定
+        var type = /エレベーター?/.test(title) ? 'elevator' : 'normal';// エレベーター判定
         var content = this.createInfoContent(coords, title);
 
-        this.markers.push(this.createMarker(coords, title, content, icon));
+        this.markers.push(markerFactory.create(type, coords, title, content));
         bounds.extend(coords);
       }, this);
 

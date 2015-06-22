@@ -919,22 +919,22 @@ define('app/condition',[
   }
   extend(ConditionVM.prototype, {
     getAPIParams: function() {
-      console.log('ConditionVM#getAPIParams');
+      //console.log('ConditionVM#getAPIParams');
       return ['lat=' + this.lat(), 'lon=' + this.lon(), 'radius=' + this.radius()].join('&');
     },
     setLatLng: function(lat, lon) {
-      console.log('ConditionVM#setLatLng');
+      //console.log('ConditionVM#setLatLng');
       this.lat(lat);
       this.lon(lon);
-      this.getAddress();
+      $('#start-search').trigger('click');
     },
     getLatLng: function() {
-      console.log('ConditionVM#getLatLng');
+      //console.log('ConditionVM#getLatLng');
       var params = GEOC_PREFIX_ADDRESS + encodeURIComponent(this.address());
       $.getJSON(GEOC_API_BASE + params + GEOC_FILTER + GEOC_POSTFIX, $.proxy(this.onGeocodingSuccess, this));
     },
     onGeocodingSuccess: function(data, status, xhr) {
-      console.log('ConditionVM#onGeocodingSuccess');
+      //console.log('ConditionVM#onGeocodingSuccess');
       if (data.status === 'OK') {
         //console.log(data.results);
         var sgst = [];
@@ -949,14 +949,14 @@ define('app/condition',[
       }
     },
     getAddress: function(lat, lon) {
-      console.log('ConditionVM#getAddress');
+      //console.log('ConditionVM#getAddress');
       this.lat(lat);
       this.lon(lon);
       var params = GEOC_PREFIX_LATLNG + this.lat() + ',' + this.lon();
       $.getJSON(GEOC_API_BASE + params + GEOC_POSTFIX, $.proxy(this.onReverseGeocodingSuccess, this));
     },
     onReverseGeocodingSuccess: function(data, status, xhr) {
-      console.log('ConditionVM#onReverseGeocodingSuccess');
+      //console.log('ConditionVM#onReverseGeocodingSuccess');
       if (data.status === 'OK') {
         //console.log(data.results);
         this.selectLocation(new SuggestionVM(data.results[0]));
@@ -965,9 +965,11 @@ define('app/condition',[
       }
     },
     selectLocation: function(v) {
-      console.log('ConditionVM#selectLocation');
+      //console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
-      this.address(v.address);
+      var address = v.address;
+      address = address.replace(/^Unnamed\sRoad,\s/, '');
+      this.address(address);
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
       this.lat(v.lat);
       this.lon(v.lon);
@@ -980,17 +982,17 @@ define('app/condition',[
       this.isSearchByGeo(false);
     },
     hideSuggestion: function() {
-      console.log('ConditionVM#hideSuggestion');
+      //console.log('ConditionVM#hideSuggestion');
       this.suggestions.clear();
     },
     toggleFocus: function() {
-      console.log('ConditionVM#toggleFocus');
+      //console.log('ConditionVM#toggleFocus');
       if (this.suggestions.hasSuggestion()) {
         this.suggestions.toggle();
       }
     },
     toggleRange: function() {
-      console.log('ConditionVM#toggleRange');
+      //console.log('ConditionVM#toggleRange');
       var tmp = this.radius();
       var idx = targetRanges.indexOf(tmp);
       if (targetRanges[idx + 1]) {
@@ -1001,7 +1003,7 @@ define('app/condition',[
       this.radius(tmp);
     },
     onEnterKeydown: function() {
-      console.log('ConditionVM#onEnterKeydown');
+      //console.log('ConditionVM#onEnterKeydown');
       if (this.suggestions.isSelected()) {
         this.selectLocation(this.suggestions.current());
       } else {
@@ -1068,15 +1070,250 @@ define('app/poi',[], function() {
 define('app/config',[], function() {
   return {
     color: {
-      key: '#29CA83',//42,202,131
-      dark: '#1F9862',//31,152,98
-      light: '#7EE0B4',//126,224,180
-      pale: '#A9EACD',//169,234,205
-      warn: '#F65855',
-      attn: '#FFE970',
-      info: '#0085C0'
+      key   : '#29CA83',//42,202,131
+      dark  : '#1F9862',//31,152,98
+      light : '#7EE0B4',//126,224,180
+      pale  : '#A9EACD',//169,234,205
+      warn  : '#F65855',
+      attn  : '#FFE970',
+      info  : '#0085C0'
     }
   };
+});
+
+/*
+*
+*   Inherit r2
+*
+*   @author Yuji Ito @110chang
+*
+*/
+
+define('mod/inherit',[], function() {
+  function inherit(d, b) {
+    if (d == null || b == null) {
+      return d;
+    }
+    var F = function() {};
+    F.prototype = b.prototype;
+    d.prototype = new F();
+    d.prototype.constructor = d;
+    return d;
+  }
+  
+  return inherit;
+});
+
+/*
+*
+*   PubSub r2
+*
+*   @author Yuji Ito @110chang
+*   via "Learning JavaScript Design Patterns" by Addy Osmani
+*
+*/
+
+define('mod/pubsub',[
+  'mod/extend'
+], function(extend) {
+  var _uid = -1;
+
+  function PubSub() {
+    if (!(this instanceof PubSub)) {
+      return new PubSub();
+    }
+    this.topics = {};
+  }
+  extend(PubSub.prototype, {
+    topics: {},
+    publish: function(topic, args) {
+      if (!this.topics[topic]) {
+        return false;
+      }
+      
+      var subscribers = this.topics[topic],
+        len = subscribers ? subscribers.length : 0,
+        context, func;
+      
+      while (len--) {
+        context = subscribers[len].context || undefined;
+        func = subscribers[len].func;
+        
+        if (context === undefined) {
+          func(topic, args);
+        } else {
+          context[func].call(context, topic, args);
+        }
+      }
+    },
+    subscribe: function(topic, func, context) {
+      if (!this.topics[topic]) {
+        this.topics[topic] = [];
+      }
+      
+      var token = (++_uid) + '',
+        subscriber = {};
+      //console.log(_uid);
+      if (typeof func === 'string' && context !== undefined) {
+        subscriber = {
+          token: token,
+          context: context,
+          func: func
+        };
+      } else if (typeof func === 'function') {
+        subscriber = {
+          token: token,
+          func: func
+        };
+      }
+      
+      this.topics[topic].push(subscriber);
+      
+      return token;
+    },
+    unsubscribe: function() {
+      var m, i = 0, token;
+      
+      if (arguments.length === 1) {
+        token = arguments[0];
+        
+        for (m in this.topics) {
+          if (this.topics[m]) {
+            for (; i < this.topics[m].length; i++) {
+              if (this.topics[m][i].token === token) {
+                this.topics[m].splice(i, 1);
+                
+                return token;
+              }
+            }
+          }
+        }
+      } else if (arguments.length === 2) {
+        var topic = arguments[0],
+          func = arguments[1];
+        
+        if (this.topics[topic]) {
+          for (; i < this.topics[topic].length; i++) {
+            if (this.topics[topic][i].func === func) {
+              this.topics[topic].splice(i, 1);
+              
+              return token;
+            }
+          }
+        }
+      }
+      return this;
+    },
+    // short hands
+    pub: this.publish,
+    sub: this.subscribe,
+    unsub: this.unsubscribe
+  });
+
+  return PubSub;
+});
+
+/*
+*
+*   MarkerFactory
+*
+*   @author Yuji Ito @110chang
+*
+*/
+
+define('app/markerfactory',[
+  'mod/extend',
+  'mod/inherit',
+  'mod/pubsub',
+  'app/condition'
+], function(extend, inherit, PubSub, ConditionVM) {
+  var exitIcon = {
+    url: '../img/ico_exit.png',
+    scaledSize : new google.maps.Size(22, 40),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(11, 40)
+  };
+  var elevIcon = {
+    url: '../img/ico_elev.png',
+    scaledSize : new google.maps.Size(22, 40),
+    origin: new google.maps.Point(0, 0),
+    anchor: new google.maps.Point(11, 40)
+  };
+  var options = {
+    normal: {
+      name: 'normal',
+      icon: exitIcon
+    },
+    elevator: {
+      name: 'elevator',
+      icon: elevIcon
+    },
+    center: {
+      name: 'center'
+    }
+  };
+  function MarkerFactory(map) {
+    if (!(this instanceof MarkerFactory)) {
+      return new MarkerFactory(map);
+    }
+    PubSub.call(this);
+
+    this.map = map;
+  }
+  inherit(MarkerFactory, PubSub);
+  extend(MarkerFactory.prototype, {
+    create: function(/* [type, ]latLng, title, content */) {
+      var type = 'normal';
+      if (typeof arguments[0] === 'string') {
+        type = Array.prototype.shift.call(arguments);
+      }
+      var latLng = arguments[0];
+      var title = arguments[1];
+      var content = arguments[2];
+      var draggable = false;
+      if (type === 'center') {
+        draggable = true;
+      }
+      // create marker option
+      var opt = $.extend(options[type], {
+        position: latLng,
+        map: this.map,
+        title: title,
+        draggable: draggable
+      });
+
+      // create marker
+      var marker = new google.maps.Marker(opt);
+      var _self = this;
+
+      // create infowindow if specified content
+      if (content) {
+        var infoWindow = new google.maps.InfoWindow({
+          content: content
+        });
+        if (draggable) {
+          google.maps.event.addListener(marker, 'dragend', function(e) {
+            //this.map.setCenter(e.latLng);
+            ConditionVM().setLatLng(e.latLng.lat(), e.latLng.lng());
+          });
+        } else {
+          google.maps.event.addListener(marker, 'mouseover', function() {
+            infoWindow.open(this.map, marker);
+          });
+          google.maps.event.addListener(marker, 'mouseout', function() {
+            infoWindow.close(this.map, marker);
+          });
+          google.maps.event.addListener(marker, 'click', function() {
+            infoWindow.open(this.map, marker);
+            _self.publish('markerClick', this.getPosition());
+          });
+        }
+      }
+      return marker;
+    }  
+  });
+
+  return MarkerFactory;
 });
 
 /*
@@ -1175,7 +1412,7 @@ define('app/directions',[
   }
   extend(Directions.prototype, {
     update: function(from, to) {
-      console.log('Directions#update');
+      //console.log('Directions#update');
       this.from = from;
       this.to = to;
       var opt = {
@@ -1192,7 +1429,7 @@ define('app/directions',[
       this.service.route(opt, $.proxy(this.onRouteSuccess, this));
     },
     onRouteSuccess: function(result, status) {
-      console.log('Directions#success');
+      //console.log('Directions#success');
       if (status == google.maps.DirectionsStatus.OK) {
         this.display.setDirections(result);
         var pos = this.fromLatLngToPixel(this.to);
@@ -1207,7 +1444,7 @@ define('app/directions',[
       }
     },
     clear: function() {
-      console.log('Directions#clear');
+      //console.log('Directions#clear');
       if (this.display != null) {
         this.display.setMap(null);
         this.display = null;
@@ -1250,20 +1487,10 @@ define('app/map',[
   'mod/extend',
   'app/config',
   'app/condition',
+  'app/markerfactory',
   'app/directions'
-], function(extend, CFG, ConditionVM, Directions) {
-  var exitIcon = {
-    url: '../img/ico_exit.png',
-    scaledSize : new google.maps.Size(22, 40),
-    origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(11, 40)
-  };
-  var elevIcon = {
-    url: '../img/ico_elev.png',
-    scaledSize : new google.maps.Size(22, 40),
-    origin: new google.maps.Point(0, 0),
-    anchor: new google.maps.Point(11, 40)
-  };
+], function(extend, CFG, ConditionVM, MarkerFactory, Directions) {
+  var markerFactory;
 
   function latLng(lat, lng) {
     return new google.maps.LatLng(lat, lng);
@@ -1286,7 +1513,7 @@ define('app/map',[
         position: google.maps.ControlPosition.LEFT_CENTER
       },
       // https://snazzymaps.com/style/39/paper
-      styles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"simplified"},{"hue":"#0066ff"},{"saturation":74},{"lightness":100}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"off"},{"weight":0.6},{"saturation":-85},{"lightness":61}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"visibility":"on"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road.local","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"simplified"},{"color":"#5f94ff"},{"lightness":26},{"gamma":5.86}]}]
+      //styles: [{"featureType":"administrative","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"landscape","elementType":"all","stylers":[{"visibility":"simplified"},{"hue":"#0066ff"},{"saturation":74},{"lightness":100}]},{"featureType":"poi","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"road.highway","elementType":"all","stylers":[{"visibility":"off"},{"weight":0.6},{"saturation":-85},{"lightness":61}]},{"featureType":"road.highway","elementType":"geometry","stylers":[{"visibility":"on"}]},{"featureType":"road.arterial","elementType":"all","stylers":[{"visibility":"off"}]},{"featureType":"road.local","elementType":"all","stylers":[{"visibility":"on"}]},{"featureType":"transit","elementType":"all","stylers":[{"visibility":"simplified"}]},{"featureType":"water","elementType":"all","stylers":[{"visibility":"simplified"},{"color":"#5f94ff"},{"lightness":26},{"gamma":5.86}]}]
     });
 
     // show subway lines
@@ -1307,51 +1534,29 @@ define('app/map',[
     // initialize direction service
     this.directions = new Directions(this.map);
 
+    markerFactory = new MarkerFactory(this.map);
+    markerFactory.subscribe('markerClick', $.proxy(this.onMarkerClick, this));
+
+    //google.maps.event.addListener(this.map, 'click', $.proxy(this.onClick, this));
     google.maps.event.addListener(this.map, 'center_changed', $.proxy(this.onCenterChanged, this));
   }
   extend(Map.prototype, {
     onCenterChanged: function() {
-      console.log('Map#onCenterChanged');
-      console.log('center changed');
+      //console.log('Map#onCenterChanged');
+      //console.log('center changed');
       //this.clearRoute();
     },
-    clearRoute: function() {
-      console.log('Map#clearRoute');
-      this.directions.clear();
+    onClick: function(e) {
+      //console.log('Map#onClick');
+      //console.log(e.latLng);
     },
-    createMarker: function(latLng, title, content, icon) {
-      //console.log('Map#createMarker');
-      // create marker option
-      var opt = {
-        position: latLng,
-        map: this.map,
-        title: title
-      };
-      if (icon) {
-        opt.icon = icon;
-      }
-
-      // create marker
-      var marker = new google.maps.Marker(opt);
-      var _self = this;
-
-      // create infowindow if specified content
-      if (content) {
-        var infoWindow = new google.maps.InfoWindow({
-          content: content
-        });
-        google.maps.event.addListener(marker, 'mouseover', function() {
-          infoWindow.open(this.map, marker);
-        });
-        google.maps.event.addListener(marker, 'mouseout', function() {
-          infoWindow.close(this.map, marker);
-        });
-        google.maps.event.addListener(marker, 'click', function() {
-          infoWindow.open(this.map, marker);
-          _self.findRoute(this.getPosition());
-        });
-      }
-      return marker;
+    onMarkerClick: function(e, data) {
+      //console.log('Map#onMarkerClick');
+      this.findRoute(data);
+    },
+    clearRoute: function() {
+      //console.log('Map#clearRoute');
+      this.directions.clear();
     },
     createInfoContent: function(latLng, title) {
       //console.log('Map#createInfoContent');
@@ -1360,11 +1565,11 @@ define('app/map',[
       return content;
     },
     findRoute: function(to) {
-      console.log('Map#findRoute');
+      //console.log('Map#findRoute');
       this.directions.update(this.center, to);
     },
     update: function(points) {
-      console.log('Map#update');
+      //console.log('Map#update');
       points = points || [];
       this.clearRoute();
       // remove existing markers
@@ -1378,7 +1583,7 @@ define('app/map',[
       this.map.panTo(this.center);
       
       // create center marker
-      this.markers.push(this.createMarker(this.center, ConditionVM().address(), ConditionVM().address()));
+      this.markers.push(markerFactory.create('center', this.center, ConditionVM().address(), ConditionVM().address()));
 
       // initialize bounds
       var bounds = new google.maps.LatLngBounds();
@@ -1388,10 +1593,10 @@ define('app/map',[
       points.forEach(function(p) {
         var title = p.title;
         var coords = latLng(p.lat, p.lon);
-        var icon = /エレベーター?/.test(title) ? elevIcon : exitIcon;// エレベーター判定
+        var type = /エレベーター?/.test(title) ? 'elevator' : 'normal';// エレベーター判定
         var content = this.createInfoContent(coords, title);
 
-        this.markers.push(this.createMarker(coords, title, content, icon));
+        this.markers.push(markerFactory.create(type, coords, title, content));
         bounds.extend(coords);
       }, this);
 
@@ -1433,7 +1638,7 @@ define('app/poicollection',[
   }
   extend(POICollectionVM.prototype, {
     update: function(data) {
-      console.log('POICollectionVM#update');
+      //console.log('POICollectionVM#update');
       var points = [];
       ko.utils.arrayForEach(data, function(e) {
         var poi = new POIVM(e);
@@ -1445,19 +1650,19 @@ define('app/poicollection',[
       return this.points().length;
     },
     search: function(params) {
-      console.log('POICollectionVM#search');
+      //console.log('POICollectionVM#search');
       //console.log(PROXY_URL + '?url=' + API_BASE + params);
       var url = PROXY_URL + '?url=' + API_BASE + params;
       $.getJSON(url, $.proxy(this.onAPISuccess, this)).fail($.proxy(this.onAPIError, this));
     },
     onAPISuccess: function(results) {
-      console.log('POICollectionVM#onAPISuccess');
+      //console.log('POICollectionVM#onAPISuccess');
       this.update(results);
       $(window).trigger('onMetroAPISuccess', { results: results });
     },
     onAPIError: function(results) {
-      console.log('POICollectionVM#onAPIError');
-      console.log(results)
+      //console.log('POICollectionVM#onAPIError');
+      //console.log(results)
       $(window).trigger('onMetroAPIFail');
     }
   });
@@ -1499,7 +1704,7 @@ define('app/geolocation',[
   }
   extend(Geolocation.prototype, {
     getCurrent: function() {
-      console.log('Geolocation#getCurrent');
+      //console.log('Geolocation#getCurrent');
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition($.proxy(this.success, this), $.proxy(this.error, this), {
           enableHighAccuracy: true,
@@ -1510,14 +1715,14 @@ define('app/geolocation',[
       }
     },
     success: function(pos) {
-      console.log('Geolocation#success');
+      //console.log('Geolocation#success');
       this.lat = pos.coords.latitude;//35.684378;//test code
       this.lon = pos.coords.longitude;//139.738338;//test code
       $(window).trigger('onGeolocationSuccess');
     },
     error: function(error) {
-      console.log('Geolocation#error');
-      console.log(error.code);
+      //console.log('Geolocation#error');
+      //console.log(error.code);
       $(window).trigger('onGeolocationFail');
     }
   });
@@ -1753,9 +1958,9 @@ require([
     stashInputValue($('#param-radius-input'));
 
     $('#param-address-input').on('focus', function(e) {
-      console.log('Main#paramAddressInputFocus');
+      //console.log('Main#paramAddressInputFocus');
       $(this).on('keydown.tabControl', function(e) {
-        console.log(e.keyCode);
+        //console.log(e.keyCode);
         if (e.keyCode === 9) {
           e.preventDefault();
           conditionVM.toggleFocus();
@@ -1767,12 +1972,12 @@ require([
     });
 
     $('#param-address-input').on('blur', function(e) {
-      console.log('Main#paramAddressInputBlur');
+      //console.log('Main#paramAddressInputBlur');
       $(this).off('keydown.tabControl');
     });
 
     $('#start-search').on('click', function(e) {
-      console.log('%cMain#startSearchClicked', 'background: yellow');
+      //console.log('%cMain#startSearchClicked', 'background: yellow');
       if (map == null) {
         map = new Map('#gmap');
       }
@@ -1787,7 +1992,7 @@ require([
     });
 
     $('#current-location').on('click', function(e) {
-      console.log('%cMain#currentLocaitonClicked', 'background: yellow');
+      //console.log('%cMain#currentLocaitonClicked', 'background: yellow');
       geolocation.getCurrent();
       conditionVM.isSearchByGeo(true);
       $.notify('現在地を確認しています', 'info');
