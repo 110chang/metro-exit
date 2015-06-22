@@ -66,7 +66,7 @@ define([
       //console.log('ConditionVM#setLatLng');
       this.lat(lat);
       this.lon(lon);
-      this.getAddress();
+      $('#start-search').trigger('click');
     },
     getLatLng: function() {
       //console.log('ConditionVM#getLatLng');
@@ -107,7 +107,9 @@ define([
     selectLocation: function(v) {
       //console.log('ConditionVM#selectLocation');
       //this.addressSubscription.dispose();
-      this.address(v.address);
+      var address = v.address;
+      address = address.replace(/^Unnamed\sRoad,\s/, '');
+      this.address(address);
       //this.addressSubscription = this.address.subscribe(this.getLatLng, this);
       this.lat(v.lat);
       this.lon(v.lon);
