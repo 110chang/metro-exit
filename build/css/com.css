@@ -620,6 +620,7 @@ button.button-skin[disabled] .button-label {
   margin: 0 0 2em;
   text-align: center;
   font-family: "Montserrat", sans-serif;
+  color: #99A099;
 }
 .powered a {
   display: inline-block;
